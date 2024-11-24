@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galletas Deli</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sahitya:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <!-- Barra de navegación -->        
+    <nav>
+        <div class="selection-nav">
+            <a href="{{ url_for('catalogo_productos') }}">Ordenar</a>
+            <a href=""><u>Rastrear</u></a>
+        </div>        
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/logo_ventas.png') }}" alt="Logo">            
+        </div>
+        <div class="user-icon">
+            <img src="{{ url_for('static', filename='images/user-icon.png') }}" alt="Usuario">
+        </div>
+    </nav>
+            
+    <!-- Contenido principal -->
+    <div class="main-container">
+        <!-- Lista de productos -->         
+        <div class="order-list">
+            <div class="order-list-header">
+                <p>Order</p>
+                <p>Creation date</p>
+                <p>Delivery date</p>
+                <p>Status</p>
+                <p></p>                
+            </div>
+            {% for order in orders %}
+            <div class="order-item">                
+                <p>{{ order['id'] }}</p>
+                <p>{{ order['creation_date'] }}</p>
+                <p>{{ order['delivery_date'] }}</p>
+                <p>{{ order['status'] }}</p>
+                <a href="{{ (order['details']) }}">Details</a>
+            </div>
+            {% endfor %}
+        </div>        
+    </div>
+</body>
+</html>

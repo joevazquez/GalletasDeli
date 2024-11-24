@@ -75,6 +75,8 @@ cursor.execute('''
         Lote_ID INT NOT NULL,
         Cantidad INT NOT NULL,
         Fecha DATETIME NOT NULL,
+        Nombre VARCHAR(30) NOT NULL,
+        Presentacion VARCHAR(50) NOT NULL, 
         FOREIGN KEY (Lote_ID) REFERENCES Lotes(ID)
     )
 ''')
