@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registro de Lote</title>
+    <!-- Font Awesome CDN for icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="ingreso-producto-style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="sidebar">
+        <div class="header">
+          <img src="profile.png" alt="Administrador" />
+          <div>
+            <p>Administrador</p>
+            <p>DATA CONSULTING</p>
+            <p>OF. TACNA</p>
+            <p>SEDE</p>
+          </div>
+        </div>
+        <nav>
+          <ul>
+            <li><a href="#">Registro de Ingredientes</a></li>
+            <li><a href="#">Toma de Inventario</a></li>
+            <li><a href="#">Registro de Lote</a></li>
+            <li><a href="#">Salida de Lote</a></li>
+            <li><a href="#">Inventario</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <div class="main-content">
+        <h1 class="header-one">Registro de lote</h1>
+        <header class="page-header">
+          <div class="header-left">
+            <!-- Keep your edit icon here -->
+            <i
+              class="fas fa-edit icon"
+              style="font-size: 24px; color: #094779"
+            ></i>
+            <h1 class="header-two">Datos del lote</h1>
+          </div>
+          <hr class="divider" />
+          <div class="header-right">
+            <i
+              class="fas fa-bars menu-icon"
+              style="font-size: 24px; color: #094779"
+            ></i>
+            Guardar
+          </div>
+        </header>
+
+        <div class="form-container">
+          <div class="form-header">
+            <h2>Datos del producto</h2>
+            <button type="button" class="label-button">
+              Imprimir etiqueta
+            </button>
+          </div>
+          <form>
+            <section class="product-details">
+              <div class="input-row">
+                <div class="input-group">
+                  <select id="lot-type" name="lot-type">
+                    <option value="" disabled selected>Tipo de lote</option>
+                    <option value="caja-chica">Caja Chica</option>
+                    <option value="caja-mediana">Caja Mediana</option>
+                    <option value="caja-grande">Caja Grande</option>
+                  </select>
+                </div>
+
+                <div class="input-group">
+                  <input
+                    type="number"
+                    id="quantity"
+                    name="quantity"
+                    placeholder="Cantidad"
+                  />
+                </div>
+              </div>
+
+              <div class="input-row">
+                <div class="input-group">
+                  <input
+                    type="date"
+                    id="entry-date"
+                    name="entry-date"
+                    placeholder="Fecha de ingreso"
+                  />
+                </div>
+
+                <div class="input-group">
+                  <input
+                    type="date"
+                    id="expiry-date"
+                    name="expiry-date"
+                    placeholder="Fecha de Caducidad"
+                  />
+                </div>
+              </div>
+
+              <div class="input-group">
+                <select id="storage-location" name="storage-location">
+                  <option value="" disabled selected>
+                    Ubicación de almacenamiento
+                  </option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                </select>
+              </div>
+
+              <div class="input-group">
+                <textarea
+                  id="lot-details"
+                  name="lot-details"
+                  placeholder="Detalles del lote"
+                ></textarea>
+              </div>
+            </section>
+
+            <div class="buttons">
+              <button type="button" class="cancel-button">Cancelar</button>
+              <button type="submit" class="next-button">Siguiente ></button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="success-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <p>Se guardó con éxito en el inventario</p>
+        <div class="check-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+      </div>
+    </div>
+
+    <script src="ingreso-producto-script.js"></script>
+  </body>
+</html>
