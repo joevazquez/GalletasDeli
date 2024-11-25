@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+    <title>Dashboard - Ventas</title>
+    <style>
+        html {
+            font-family: "Montserrat";
+        }
+
+        body {
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            color: #094779;
+            background-color: #EEEEEE;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 style="width: 100%; margin: 0; height: 70px; padding-left: 20px;align-content: center;">Reporte de Ventas</h1>
+    <div style="margin: 10px;">
+        <div style="display: flex;">
+            <canvas id="ventas_mes" style="max-width:25%; max-height: 300px"></canvas>
+            <canvas id="presentacion" style="max-width:25%; max-height: 300px"></canvas>
+            <canvas id="galletas" style="max-width:25%; max-height: 300px"></canvas>
+            <div id="top_clientes"
+                style="max-width:25%; max-height: 300px; font-size: 12px;overflow-y: auto;overflow-x: hidden;"></div>
+        </div>
+        <div style="display: flex;">
+            <canvas id="ventas_ano" style="max-width:60%; max-height: 300px"></canvas>
+            <div id="top_estados"
+                style="max-width:40%; max-height: 300px; font-size: 12px;overflow-y: auto;overflow-x: hidden;"></div>
+        </div>
+    </div>
+
+    <script>
+        Chart.defaults.backgroundColor = '#094779'
+        const ventas_mes = document.getElementById("ventas_mes")
+        const presentacion = document.getElementById("presentacion")
+        const galletas = document.getElementById("galletas")
+
+        const ventas_ano = document.getElementById("ventas_ano")
+
+        new Chart(ventas_mes, {
+            type: 'bar',
+            data: {
+                labels: ['2023', '2024'],
+                datasets: [{
+                    label: 'Ventas de Noviembre',
+                    data: [235, 195],
+                    borderWidth: 1,
+                    backgroundColor: ['#094779', '#50A1E2']
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        new Chart(presentacion, {
+            type: 'doughnut',
+            data: {
+                labels: ['Medio kilo', '6 piezas'],
+                datasets: [{
+                    label: 'Caja',
+                    data: [100, 50],
+                    borderWidth: 1,
+                    backgroundColor: ['#094779', '#50A1E2']
+                }]
+            }
+        });
+
+        new Chart(galletas, {
+            type: 'bar',
+            data: {
+                labels: ['Surtido', 'Naranja', 'Coco', 'Chocolate', 'Avena', 'Nuez'],
+                datasets: [{
+                    label: 'Ranking de Galletas',
+                    data: [50, 45, 40, 39, 37, 20],
+                    borderWidth: 1,
+                    backgroundColor: ['#094779', '#50A1E2']
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        new gridjs.Grid({
+            columns: [
+                {
+                    name: 'Nombre',
+                    sort: false
+                },
+                'Ticket Promedio'
+            ],
+            data: [
+                ['John Doe', '$5,201'],
+                ['Marck Zill', '$5,156'],
+                ['Alice Peterson', '$5,006'],
+                ['Sara Jhonson', '$4,569'],
+                ['Damian Flaggs', '$4,332'],
+                ['Perla Castro', '$3,956'],
+                ['Jorge Lopez', '$2,589'],
+                ['Joseph Turner', '$2,365'],
+                ['Ivan Cruz', '$2,124'],
+                ['Mary Smith', '$1,598'],
+            ],
+            sort: true,
+            style: {
+                th: {
+                    color: '#094779'
+                }
+            }
+        }).render(document.getElementById('top_clientes'));
+
+        new Chart(ventas_ano, {
+            type: 'scatter',
+            data: {
+                labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                datasets: [{
+                    type: 'line',
+                    label: 'Ventas 2023',
+                    data: [16, 23, 30, 40, 43, 23, 45, 23, 12, 32, 65, 56]
+                }, {
+                    type: 'line',
+                    label: 'Ventas 2024',
+                    data: [20, 45, 23, 45, 36, 34, 65, 12, 15, 30, 70, 50],
+                    backgroundColor: '#50A1E2'
+                }],
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        new gridjs.Grid({
+            columns: [
+                {
+                    name: 'Estado',
+                    sort: false
+                },
+                'Venta',
+                "Cantidad"
+            ],
+            data: [
+                ['Ciudad de México', '$50,201', 10000],
+                ['Estado de México', '$50,156', 7000],
+                ['Queretaro', '$50,006', 5000],
+                ['Puebla', '$40,569', 4000],
+                ['Aguascalientes', '$40,332', 3000],
+                ['Nuevo Leon', '$30,956', 2500],
+                ['Baja California', '$20,589', 2000],
+                ['Yucatán', '$20,365', 1500],
+                ['Quintana Roo', '$20,124', 1000],
+                ['Colima', '$10,598', 500],
+            ],
+            sort: true,
+            style: {
+                th: {
+                    color: '#094779'
+                }
+            }
+        }).render(document.getElementById('top_estados'));
+
+    </script>
+
+</body>
+
+</html>
