@@ -1,188 +1,193 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galletas Deli</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sahitya:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">    
+    <title>Galletas Deli - Ordenar</title>
+    <link rel="stylesheet" href="/static/css/catalogo-productos.css">
 </head>
 <body>
     <!-- Barra de navegación -->
-    <nav>
-        <div class="selection-nav">
-            <a href=""><u>Ordenar</u></a>
-            <a href="{{ url_for('rastreo_ordenes') }}">Rastrear</a>
-        </div>        
+    <nav class="navbar">
+        <div class="nav-links">
+            <a href="{{ url_for('catalogo_productos') }}" class="active">Ordenar</a>
+            <a href="#">Rastrear</a>
+        </div>
         <div class="logo">
-            <img src="{{ url_for('static', filename='images/logo_ventas.png') }}" alt="Logo">            
+            <img src="/static/images/logo_ventas.png" alt="Galletas Deli">
         </div>
-        <div class="user-icon">
-            <img src="{{ url_for('static', filename='images/user-icon.png') }}" alt="Usuario">
+        <div class="user-greeting">
+            Hola, {{ user_name }}
         </div>
+        
     </nav>
-    
-    <!-- Contenido principal -->
+
+    <!-- Contenedor principal -->
     <div class="main-container">
         <!-- Lista de productos -->
         <div class="product-list">
-            {% for product in products %}
-            <div class="product-card" data-product-name="{{ product.name }}" data-product-image="{{ url_for('static', filename='images/' + product['image']) }}">
-                <img src="{{ url_for('static', filename='images/' + product['image']) }}" alt="{{ product.name }}">
-                <h3>{{ product.name }}</h3>
+            <div class="product-card">
+                <img src="/static/images/galletas-besos-nuez.jpg" alt="Nuez">
+                <p>Nuez</p>
+                <div class="counter">
+                    <button class="decrement" onclick="updateCounter('nuez', 'half-kilo', -1)">−</button>
+                    <span id="nuez-half-kilo-counter">0</span>
+                    <button class="increment" onclick="updateCounter('nuez', 'half-kilo', 1)">+</button>
+                </div>
+                <div class="counter">
+                    <button class="decrement" onclick="updateCounter('nuez', 'six-pieces', -1)">−</button>
+                    <span id="nuez-six-pieces-counter">0</span>
+                    <button class="increment" onclick="updateCounter('nuez', 'six-pieces', 1)">+</button>
+                </div>
             </div>
-            {% endfor %}
+
+
+            <div class="product-card">
+                <img src="/static/images/galletas-naranja.jpg" alt="Naranja">
+                <p>Naranja</p>
+                <div class="counter">
+                    <button class="decrement" onclick="updateCounter('naranja', 'half-kilo', -1)">−</button>
+                    <span id="naranja-half-kilo-counter">0</span>
+                    <button class="increment" onclick="updateCounter('naranja', 'half-kilo', 1)">+</button>
+                </div>
+                <div class="counter">
+                    <button class="decrement" onclick="updateCounter('naranja', 'six-pieces', -1)">−</button>
+                    <span id="naranja-six-pieces-counter">0</span>
+                    <button class="increment" onclick="updateCounter('naranja', 'six-pieces', 1)">+</button>
+                </div>
+            </div>
+
+
+            <div class="product-card">
+                <img src="/static/images/galletas-coco.jpg" alt="Naranja">
+                <p>Naranja</p>
+                <div class="counter">
+                    <button class="decrement" onclick="updateCounter('coco', 'half-kilo', -1)">−</button>
+                    <span id="coco-half-kilo-counter">0</span>
+                    <button class="increment" onclick="updateCounter('coco', 'half-kilo', 1)">+</button>
+                </div>
+                <div class="counter">
+                    <button class="decrement" onclick="updateCounter('coco', 'six-pieces', -1)">−</button>
+                    <span id="coco-six-pieces-counter">0</span>
+                    <button class="increment" onclick="updateCounter('coco', 'six-pieces', 1)">+</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <img src="/static/images/galletas-chocolate.jpg" alt="Naranja">
+                <p>Naranja</p>
+                <div class="counter">
+                    <button class="decrement" onclick="updateCounter('chocolate', 'half-kilo', -1)">−</button>
+                    <span id="chocolate-half-kilo-counter">0</span>
+                    <button class="increment" onclick="updateCounter('chocolate', 'half-kilo', 1)">+</button>
+                </div>
+                <div class="counter">
+                    <button class="decrement" onclick="updateCounter('chocolate', 'six-pieces', -1)">−</button>
+                    <span id="chocolate-six-pieces-counter">0</span>
+                    <button class="increment" onclick="updateCounter('chocolate', 'six-pieces', 1)">+</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <img src="/static/images/galletas-avena.jpg" alt="Naranja">
+                <p>Naranja</p>
+                <div class="counter">
+                    <button class="decrement" onclick="updateCounter('avena', 'half-kilo', -1)">−</button>
+                    <span id="avena-half-kilo-counter">0</span>
+                    <button class="increment" onclick="updateCounter('avena', 'half-kilo', 1)">+</button>
+                </div>
+                <div class="counter">
+                    <button class="decrement" onclick="updateCounter('avena', 'six-pieces', -1)">−</button>
+                    <span id="avena-six-pieces-counter">0</span>
+                    <button class="increment" onclick="updateCounter('avena', 'six-pieces', 1)">+</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <img src="/static/images/galletas-surtidas.jpg" alt="Naranja">
+                <p>Naranja</p>
+                <div class="counter">
+                    <button class="decrement" onclick="updateCounter('surtidas', 'half-kilo', -1)">−</button>
+                    <span id="surtidas-half-kilo-counter">0</span>
+                    <button class="increment" onclick="updateCounter('surtidas', 'half-kilo', 1)">+</button>
+                </div>
+                <div class="counter">
+                    <button class="decrement" onclick="updateCounter('surtidas', 'six-pieces', -1)">−</button>
+                    <span id="surtidas-six-pieces-counter">0</span>
+                    <button class="increment" onclick="updateCounter('surtidas', 'six-pieces', 1)">+</button>
+                </div>
+            </div>
         </div>
 
         <!-- Resumen del pedido -->
         <div class="order-summary">
-            <h2>Resumen del Pedido</h2>            
-            <div id="order-details"></div>
+            <h2>Resumen del Pedido</h2>
+            <div class="prices">
+                <p><strong>Precios:</strong></p>
+                <p>Caja de medio kilo: $100</p>
+                <p>Caja de 6 piezas: $50</p>
+            </div>
+            <div class="order-details" id="order-details">
+                <!-- Actualización dinámica del pedido -->
+            </div>
             <p class="total" id="order-total">Total: $0.00</p>
+            <button class="btn-order">Ordenar</button>
         </div>
-        <div class="order-button">
-            <!-- Botón para enviar la orden -->
-            <form id="order-form" method="POST" action="/crear_orden">
-                <input type="hidden" name="order_summary" id="order-summary-input">
-                <button type="submit">Ordenar</button>
-            </form>           
-        </div>
+        
     </div>
 
-    <!-- Modal para escoger parámetros -->
-    <div class="modal" id="product-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <p id="selected-product"></p>
-            </div>
-            <div class="modal-body">    
-                <div class="modal-image">                            
-                    <img id="modal-product-image" src="" alt="Imagen del Producto">
-                </div>
-                <div class="modal-option-selection">
-                    <div class="modal-option">
-                        <p>Cajas de medio kilo - $100 c/u</p>
-                        <div class="quantity-control">
-                            <button class="decrement" data-target="half-kilo">−</button>
-                            <span id="half-kilo-quantity">0</span>
-                            <button class="increment" data-target="half-kilo">+</button>
-                        </div>
-                    </div>
-                    <div class="modal-option">
-                        <p>Cajas de 6 piezas - $100 c/u</p>
-                        <div class="quantity-control">
-                            <button class="decrement" data-target="six-pieces">−</button>
-                            <span id="six-pieces-quantity">0</span>
-                            <button class="increment" data-target="six-pieces">+</button>
-                        </div>
-                    </div>                   
-                </div>
-            </div>
-            <button class="close-modal">Agregar</button>
-        </div>
-    </div>
-
+    <!-- Scripts -->
     <script>
-        const productCards = document.querySelectorAll('.product-card');
-        const modal = document.getElementById('product-modal');
-        const closeModalButton = document.querySelector('.close-modal');
-        const selectedProductText = document.getElementById('selected-product');
-        const modalImage = document.getElementById('modal-product-image');
-        const orderDetails = document.getElementById('order-details');
-        const orderTotal = document.getElementById('order-total');
+        const prices = { "half-kilo": 100, "six-pieces": 50 }; // Precios de cada tipo de producto
+        const orderSummary = {}; // Resumen del pedido
 
-        let currentProduct = '';
-        const orderSummary = {};
+        // Actualiza los contadores y el resumen del pedido
+        function updateCounter(product, type, change) {
+            const counterId = `${product}-${type}-counter`;
+            const counterElement = document.getElementById(counterId);
+            let count = parseInt(counterElement.textContent, 10);
 
-        // Actualiza las cantidades en el modal
-        document.querySelectorAll('.quantity-control button').forEach(button => {
-            button.addEventListener('click', function () {
-                const target = this.getAttribute('data-target');
-                const quantityElement = document.getElementById(`${target}-quantity`);
-                let quantity = parseInt(quantityElement.textContent, 10);
+            // Actualiza el contador si es mayor o igual a 0
+            count = Math.max(0, count + change);
+            counterElement.textContent = count;
 
-                if (this.classList.contains('increment')) {
-                    quantity++;
-                } else if (this.classList.contains('decrement') && quantity > 0) {
-                    quantity--;
-                }
-
-                quantityElement.textContent = quantity;
-            });
-        });
-
-        // Abre el modal cuando se selecciona un producto
-        productCards.forEach(card => {
-            card.addEventListener('click', () => {
-                currentProduct = card.getAttribute('data-product-name');
-                const productImage = card.getAttribute('data-product-image');
-                selectedProductText.textContent = currentProduct;
-                modalImage.src = productImage;
-                modal.style.display = 'flex';
-
-                // Resetea las cantidades del modal
-                document.getElementById('half-kilo-quantity').textContent = 0;
-                document.getElementById('six-pieces-quantity').textContent = 0;
-            });
-        });
-
-        // Cierra el modal y actualiza el resumen del pedido
-        closeModalButton.addEventListener('click', () => {
-            const halfKiloQuantity = parseInt(document.getElementById('half-kilo-quantity').textContent, 10);
-            const sixPiecesQuantity = parseInt(document.getElementById('six-pieces-quantity').textContent, 10);
-
-            if (!orderSummary[currentProduct]) {
-                orderSummary[currentProduct] = { halfKilo: 0, sixPieces: 0 };
+            // Actualiza el resumen del pedido
+            if (!orderSummary[product]) {
+                orderSummary[product] = { "half-kilo": 0, "six-pieces": 0 };
             }
-
-            orderSummary[currentProduct].halfKilo += halfKiloQuantity;
-            orderSummary[currentProduct].sixPieces += sixPiecesQuantity;
+            orderSummary[product][type] = count;
 
             updateOrderSummary();
-            modal.style.display = 'none';
-        });
+        }
 
-        // Actualiza el resumen del pedido
+        // Actualiza el HTML del resumen del pedido
         function updateOrderSummary() {
+            const orderDetails = document.getElementById("order-details");
+            const orderTotal = document.getElementById("order-total");
             let total = 0;
-            orderDetails.innerHTML = '';
+
+            orderDetails.innerHTML = ""; // Limpia el resumen previo
 
             for (const [product, quantities] of Object.entries(orderSummary)) {
-                if (quantities.halfKilo > 0 || quantities.sixPieces > 0) {
+                const { "half-kilo": halfKilo, "six-pieces": sixPieces } = quantities;
+
+                if (halfKilo > 0 || sixPieces > 0) {
                     orderDetails.innerHTML += `
-                        <h3>${product}</h3>
-                        <p>Cajas de medio kilo: ${quantities.halfKilo}</p>
-                        <p>Cajas de 6 piezas: ${quantities.sixPieces}</p>
+                        <p><strong>${capitalize(product)}</strong></p>
+                        ${halfKilo > 0 ? `<p>Cajas de medio kilo: ${halfKilo}</p>` : ""}
+                        ${sixPieces > 0 ? `<p>Cajas de 6 piezas: ${sixPieces}</p>` : ""}
                     `;
-                    total += (quantities.halfKilo + quantities.sixPieces) * 100;
+                    total += halfKilo * prices["half-kilo"] + sixPieces * prices["six-pieces"];
                 }
             }
 
             orderTotal.textContent = `Total: $${total.toFixed(2)}`;
         }
 
-        // Cierra el modal al hacer clic fuera de él
-        window.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.style.display = 'none';
-            }
-        });
-
-        // Captura el evento de clic en el botón Ordenar
-        const orderForm = document.getElementById('order-form');
-        const orderSummaryInput = document.getElementById('order-summary-input');
-
-        orderForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-
-            // Serializa el resumen del pedido en formato JSON
-            orderSummaryInput.value = JSON.stringify(orderSummary);
-
-            // Envía el formulario
-            orderForm.submit();
-        });
+        // Capitaliza la primera letra del producto
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
     </script>
 </body>
 </html>

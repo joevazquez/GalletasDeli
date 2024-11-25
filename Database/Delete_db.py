@@ -15,9 +15,9 @@ def consultar_usuarios():
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
-        # Consulta para obtener todos los usuarios
+        # Consulta para obtener todos los usuarios, incluyendo la contraseña
         query = '''
-            SELECT ID_cliente, User, Nombre, Direccion, Telefono, Email
+            SELECT ID_cliente, User, Nombre, Direccion, Telefono, Email, Contrasena
             FROM Clientes
         '''
         cursor.execute(query)
@@ -27,7 +27,7 @@ def consultar_usuarios():
         if usuarios:
             print("Usuarios en la base de datos:")
             for usuario in usuarios:
-                print(f"ID: {usuario[0]}, Usuario: {usuario[1]}, Nombre: {usuario[2]}, Dirección: {usuario[3]}, Teléfono: {usuario[4]}, Email: {usuario[5]}")
+                print(f"ID: {usuario[0]}, Usuario: {usuario[1]}, Nombre: {usuario[2]}, Dirección: {usuario[3]}, Teléfono: {usuario[4]}, Email: {usuario[5]}, Contraseña: {usuario[6]}")
         else:
             print("No hay usuarios registrados en la base de datos.")
 

@@ -10,57 +10,35 @@
     <div class="login-container">
         <img src="/static/images/logo_ventas.png" alt="Logo Galletas Deli" class="logo">
 
-        <!-- Inputs con labels flotantes -->
-        <div class="input-group">
-            <input type="text" id="username" name="username" required>
-            <label for="username">Usuario</label>
-        </div>
-        <div class="input-group">
-            <input type="password" id="password" name="password" required>
-            <label for="password">Contraseña</label>
-        </div>
+        <!-- Formulario de Login -->
+        <form action="/authenticate" method="POST">
+            <div class="input-group">
+                <input type="text" id="username" name="username" required>
+                <label for="username">Usuario</label>
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" name="password" required>
+                <label for="password">Contraseña</label>
+            </div>
 
-        <!-- Checkbox para identificar si es empleado -->
-        <div class="checkbox-group">
-            <label>
-                <input type="checkbox" id="es_empleado" name="es_empleado" value="1">
-                ¿Eres empleado?
-            </label>
-        </div>
+            <!-- Checkbox para identificar si es empleado -->
+            <div class="checkbox-group">
+                <input type="hidden" name="es_empleado" value="0"> <!-- Valor por defecto si no se selecciona -->
+                <label>
+                    <input type="checkbox" id="es_empleado" name="es_empleado" value="1">
+                    ¿Eres empleado?
+                </label>
+            </div>
 
-        <!-- Botones -->
-        <button class="btn-login" onclick="authenticateUser()">Login</button>
+            <!-- Botón para enviar el formulario -->
+            <button type="submit" class="btn-login">Login</button>
+        </form>
+
+        <!-- Botón para redirigir al registro -->
         <button class="btn-register" onclick="redirectToRegister()">Register</button>
     </div>
 
     <script>
-        // Función para autenticar al usuario
-        function authenticateUser() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            // Enviar datos al backend usando fetch
-            fetch('/authenticate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, password })
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Redirige al dashboard si la autenticación es exitosa
-                    window.location.href = '/dashboard';
-                } else {
-                    // Muestra un mensaje de error
-                    alert('Usuario o contraseña incorrectos.');
-                }
-            })
-            .catch(error => {
-                console.error('Error al autenticar:', error);
-            });
-        }
-
         // Función para redirigir al registro
         function redirectToRegister() {
             const esEmpleado = document.getElementById('es_empleado').checked;

@@ -33,6 +33,7 @@ def register():
         ciudad = request.form['ciudad']
         calle_numero = request.form['calle_numero']
         telefono = request.form['telefono']
+        correo = request.form['correo']
         contrasena = request.form['contrasena']
 
         # Concatenar los campos de dirección
@@ -72,7 +73,6 @@ def register_empleado():
         estado = request.form['estado']
         ciudad = request.form['ciudad']
         calle_numero = request.form['calle_numero']
-        telefono = request.form['telefono']
         rol = request.form['rol']
         contrasena = request.form['contrasena']
 
@@ -101,6 +101,87 @@ def register_empleado():
 
     # Renderizar el formulario de registro de empleados
     return render_template('Inicio_sesion/register_empleado.html')
+
+@app.route('/authenticate', methods=['POST'])
+def authenticate():
+    username = request.form.get('username')
+    contrasena = request.form.get('password')
+    es_empleado = request.form.get('es_empleado')  # Valor enviado como '0' o '1'
+
+    print("Datos recibidos:")
+    print(f"Usuario: {username}, Contraseña: {contrasena}, Es empleado: {es_empleado}")
+
+    conn = get_db_connection()
+
+    if es_empleado == '1':  # Si el checkbox está marcado, verificar en la tabla de empleados
+        print("Consultando en tabla Empleado...")
+        user = conn.execute('''
+            SELECT ID_empleado AS id, Rol AS role
+            FROM Empleado
+            WHERE User = ? AND Contrasena = ?
+        ''', (username, contrasena)).fetchone()
+        print("Resultado:", user)
+
+        if user:
+            # Usuario autenticado como empleado
+            session['user_type'] = 'empleado'
+            session['user_id'] = user['id']
+            session['user_role'] = user['role']
+            conn.close()
+            return render_template('hola_mundo.html', role=user['role'])  # Mostrar "Hola mundo"
+        else:
+            flash('Usuario o contraseña incorrectos.', 'danger')
+            conn.close()
+            return redirect(url_for('login'))
+    elif es_empleado == '0':  # Si el checkbox no está marcado, verificar en la tabla de clientes
+        print("Consultando en tabla Clientes...")
+        user = conn.execute('''
+            SELECT ID_cliente AS id, Nombre AS name
+            FROM Clientes
+            WHERE User = ? AND Contrasena = ?
+        ''', (username, contrasena)).fetchone()
+        print("Resultado:", user)
+
+        if user:
+            # Usuario autenticado como cliente
+            session['user_type'] = 'cliente'
+            session['user_id'] = user['id']
+            session['user_name'] = user['name']
+            conn.close()
+            return render_template('Catalogo/catalogo-productos.html', user_name=user['name'])
+        else:
+            flash('Usuario o contraseña incorrectos.', 'danger')
+            conn.close()
+            return redirect(url_for('login'))
+    else:
+        # Caso inesperado
+        flash('Error al determinar el tipo de usuario.', 'danger')
+        return redirect(url_for('login'))
+
+        
+@app.route('/dashboard')
+def dashboard():
+    if 'user_id' not in session or session.get('user_type') != 'empleado':
+        flash('Acceso no autorizado. Por favor, inicie sesión como empleado.', 'danger')
+        return redirect(url_for('login'))
+
+    user_role = session.get('user_role')
+    return f"Bienvenido al panel de empleados. Rol: {user_role}."
+
+@app.route('/catalogo_productos')
+def catalogo_productos():
+    # Verifica si el usuario está autenticado y es cliente
+    if 'user_id' not in session or session.get('user_type') != 'cliente':
+        flash('Acceso no autorizado. Por favor, inicie sesión como cliente.', 'danger')
+        return redirect(url_for('login'))
+
+    # Recupera el nombre del cliente de la sesión
+    user_name = session.get('user_name', 'Usuario')  # Valor por defecto: 'Usuario'
+
+    # Renderiza la página del catálogo y pasa el nombre del usuario
+    return render_template('Catalogo/catalogo-productos.html', user_name=user_name)
+
+
 
 @app.route('/logout')
 def logout():
