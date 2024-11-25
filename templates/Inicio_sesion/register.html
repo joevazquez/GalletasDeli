@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Galletas Deli</title>
+    <link rel="stylesheet" href="/static/css/register.css">
+</head>
+<body>
+    <div class="register-container">
+        <div class="header">
+            <img src="/static/images/logo_ventas.png" alt="Logo Galletas Deli" class="logo">
+            <h2>Registro</h2>
+        </div>
+        <form action="/register" method="POST" class="register-form">
+            <input type="text" name="nombre" placeholder="Nombre(s)" required>
+            <input type="text" name="apellido" placeholder="Apellido(s)" required>
+            <input type="text" name="user" placeholder="Nombre de Usuario" required>
+            <input type="text" name="estado" placeholder="Estado" required>
+            <input type="text" name="ciudad" placeholder="Ciudad" required>
+            <input type="text" name="calle_numero" placeholder="Calle y Número" required>
+            <input type="tel" name="telefono" placeholder="Teléfono" required>
+            <input type="email" name="correo" placeholder="Correo electrónico" required>
+            <input type="password" name="contrasena" placeholder="Contraseña" required>
+            <button type="submit" class="btn-register">Registrar</button>
+        </form>
+    </div>
+</body>
+</html>

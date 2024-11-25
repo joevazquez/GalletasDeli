@@ -92,17 +92,6 @@ cursor.execute('''
     )
 ''')
 
-# Crear la tabla Clientes
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS Clientes (
-        ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-        Nombre VARCHAR(50) NOT NULL,
-        Direccion VARCHAR(200) NOT NULL,
-        Telefono VARCHAR(18) NOT NULL,
-        Email VARCHAR(100) NOT NULL
-    )
-''')
-
 # Crear la tabla Ordenes
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS Ordenes (
@@ -138,6 +127,44 @@ cursor.execute('''
         FOREIGN KEY (Orden_detalles_ID) REFERENCES Orden_detalles(ID)
     )
 ''')
+
+# Crear la tabla Empleado
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS Empleado (
+        ID_empleado INTEGER PRIMARY KEY AUTOINCREMENT,
+        Direccion VARCHAR(255),
+        User VARCHAR(15) NOT NULL UNIQUE,  -- Hacer User único
+        Rol VARCHAR(50),
+        Contrasena VARCHAR(20) NOT NULL
+    )
+''')
+
+# Crear la tabla Clientes
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS Clientes (
+        ID_cliente INTEGER PRIMARY KEY AUTOINCREMENT,
+        User VARCHAR(15) NOT NULL UNIQUE,  -- Hacer User único
+        Nombre VARCHAR(50) NOT NULL,
+        Direccion VARCHAR(255),
+        Telefono VARCHAR(15),
+        Email VARCHAR(100),
+        Contrasena VARCHAR(20) NOT NULL
+    )
+''')
+
+
+# Crear la tabla Usuarios
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS Usuarios (
+        ID INTEGER PRIMARY KEY AUTOINCREMENT,
+        User_cliente VARCHAR(15),
+        User_empleado VARCHAR(15),
+        FOREIGN KEY (User_cliente) REFERENCES Clientes(User),
+        FOREIGN KEY (User_empleado) REFERENCES Empleado(User)
+    )
+''')
+
+
 
 # Guardar los cambios y cerrar la conexión
 conn.commit()

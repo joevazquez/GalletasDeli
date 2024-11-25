@@ -1,0 +1,85 @@
+/* General body settings */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #a5d8ff; /* Fondo azul claro */
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Contenedor principal */
+.register-container {
+    background-color: #ffffff; /* Fondo blanco */
+    padding: 20px 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+}
+
+/* Header */
+.header {
+    background-color: #a5d8ff; /* Fondo azul claro */
+    padding: 10px 0;
+    margin-bottom: 20px;
+    border-radius: 10px 10px 0 0;
+}
+
+.header .logo {
+    width: 50px;
+    display: block;
+    margin: 0 auto;
+}
+
+.header h1 {
+    color: #333333; /* Texto oscuro */
+    font-size: 22px;
+    margin: 5px 0;
+    font-weight: bold;
+}
+
+.header h2 {
+    color: #6a4c93; /* Texto morado */
+    font-size: 18px;
+    margin: 5px 0;
+}
+
+/* Formulario */
+.register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Espaciado entre los campos */
+}
+
+.register-form input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #1c3f72; /* Borde azul oscuro */
+    border-radius: 20px; /* Bordes redondeados */
+    font-size: 14px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.register-form input:focus {
+    border-color: #6a4c93; /* Borde morado al enfocar */
+}
+
+/* Botón */
+.btn-register {
+    background-color: #4c2b19; /* Marrón oscuro */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-register:hover {
+    background-color: #3a2214; /* Marrón más oscuro */
+}

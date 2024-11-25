@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesión</title>
+    <link rel="stylesheet" href="/static/css/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <img src="/static/images/logo_ventas.png" alt="Logo Galletas Deli" class="logo">
+
+        <!-- Inputs con labels flotantes -->
+        <div class="input-group">
+            <input type="User" id="username" required>
+            <label for="username">Usuario</label>
+        </div>
+        <div class="input-group">
+            <input type="password" id="password" required>
+            <label for="password">Password</label>
+        </div>
+
+        <!-- Botones -->
+        <button class="btn-login" onclick="authenticateUser()">Login</button>
+        <button class="btn-register" onclick="redirectToRegister()">Register</button>
+    </div>
+
+    <script>
+        // Función para autenticar al usuario
+        function authenticateUser() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Enviar datos al backend usando fetch
+            fetch('/authenticate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Redirige al dashboard si la autenticación es exitosa
+                    window.location.href = '/dashboard';
+                } else {
+                    // Muestra un mensaje de error
+                    alert('Usuario o contraseña incorrectos.');
+                }
+            })
+            .catch(error => {
+                console.error('Error al autenticar:', error);
+            });
+        }
+
+        // Función para redirigir al registro
+        function redirectToRegister() {
+            window.location.href = '/register';
+        }
+    </script>
+</body>
+</html>

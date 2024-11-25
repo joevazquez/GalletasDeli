@@ -1,0 +1,115 @@
+/* General body settings */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #a5d8ff; /* Fondo azul */
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Login container */
+.login-container {
+    background-color: #ffffff; /* Fondo blanco */
+    padding: 30px 50px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Logo image */
+.login-container .logo {
+    width: 100px; /* Tamaño del logo */
+    margin-bottom: 10px;
+}
+
+/* Title */
+.login-container h1 {
+    color: #6a4c93; /* Morado */
+    font-size: 28px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* Input group: label flotante y input */
+.input-group {
+    position: relative;
+    margin-bottom: 20px;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    padding-top: 20px; /* Espacio extra para el label */
+    border: 2px solid #6a4c93; /* Borde morado */
+    border-radius: 20px; /* Bordes redondeados */
+    font-size: 14px;
+    background: none;
+    outline: none;
+    position: relative;
+    z-index: 1;
+}
+
+.input-group label {
+    position: absolute;
+    top: 12px;
+    left: 15px;
+    color: #6a4c93; /* Color morado */
+    font-size: 14px;
+    transition: 0.3s ease;
+    pointer-events: none; /* Para que no interfiera con el clic */
+    z-index: 0;
+}
+
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label {
+    top: -10px; /* Mueve el label hacia arriba */
+    left: 10px; /* Ajusta la posición hacia la izquierda */
+    font-size: 12px; /* Reduce el tamaño del texto */
+    background: #ffffff; /* Fondo blanco para mejor visibilidad */
+    padding: 0 5px;
+    z-index: 2;
+}
+
+/* Botón de Login */
+.btn-login {
+    background-color: #1c3f72; /* Azul oscuro */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    width: 90%; /* Botón del mismo ancho que los inputs */
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.btn-login:hover {
+    background-color: #17355f;
+}
+
+/* Botón de Register */
+.btn-register {
+    background-color: #ffffff; /* Fondo blanco */
+    color: #6a4c93; /* Texto morado */
+    border: 2px solid #6a4c93;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    width: 90%;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin-top: 10px;
+}
+
+.btn-register:hover {
+    background-color: #6a4c93; /* Fondo morado */
+    color: white; /* Texto blanco */
+}
