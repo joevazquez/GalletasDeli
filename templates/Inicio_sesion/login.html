@@ -12,12 +12,20 @@
 
         <!-- Inputs con labels flotantes -->
         <div class="input-group">
-            <input type="User" id="username" required>
+            <input type="text" id="username" name="username" required>
             <label for="username">Usuario</label>
         </div>
         <div class="input-group">
-            <input type="password" id="password" required>
-            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+            <label for="password">Contraseña</label>
+        </div>
+
+        <!-- Checkbox para identificar si es empleado -->
+        <div class="checkbox-group">
+            <label>
+                <input type="checkbox" id="es_empleado" name="es_empleado" value="1">
+                ¿Eres empleado?
+            </label>
         </div>
 
         <!-- Botones -->
@@ -55,7 +63,14 @@
 
         // Función para redirigir al registro
         function redirectToRegister() {
-            window.location.href = '/register';
+            const esEmpleado = document.getElementById('es_empleado').checked;
+
+            // Redirigir al formulario correspondiente
+            if (esEmpleado) {
+                window.location.href = '/register_empleado';
+            } else {
+                window.location.href = '/register';
+            }
         }
     </script>
 </body>

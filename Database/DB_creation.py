@@ -132,6 +132,7 @@ cursor.execute('''
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS Empleado (
         ID_empleado INTEGER PRIMARY KEY AUTOINCREMENT,
+        Nombre VARCHAR(50) NOT NULL,
         Direccion VARCHAR(255),
         User VARCHAR(15) NOT NULL UNIQUE,  -- Hacer User único
         Rol VARCHAR(50),
@@ -159,6 +160,7 @@ cursor.execute('''
         ID INTEGER PRIMARY KEY AUTOINCREMENT,
         User_cliente VARCHAR(15),
         User_empleado VARCHAR(15),
+        Contrasena VARCHAR(20) NOT NULL,
         FOREIGN KEY (User_cliente) REFERENCES Clientes(User),
         FOREIGN KEY (User_empleado) REFERENCES Empleado(User)
     )
