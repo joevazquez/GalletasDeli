@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital@0;1&family=Sahitya:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static\stylesheets\style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <title>Registro de ingredientes</title>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+          <!-- Sidebar -->
+          <div class="col-2 sidebar p-3 vh-100">
+            <div class="text-center mb-4">
+              <img src="static\img\DefaultPicture.png" alt="" style="width: 50%;">
+              <p class="montserrat-bold mb-0 mt-3 text-center" style="font-size: 14px;">Administrador</p>
+              <p class="text-muted montserrat-bold small" style="font-size: 14px;">DATA CONSULTING</p>
+            </div>
+            <div class="row envoltura-sidebar">
+                <div class="col-auto pl-2 ">
+                    <img class="ps-1" src="static\img\Company.png" alt="">
+                </div>
+                <div class="col-auto px-0 ">
+                    <div class="montserrat-bold ">
+                        <p class="mb-0" style="font-size: 12px;">OF. TACNA</p>
+                        <p class="text-muted mb-0" style="font-size: 12px;">SEDE</p>
+                    </div>
+                </div>
+            </div>
+            <ul class="nav flex-column pt-5">
+              <li class="nav-item">
+                <a class="nav-link active text-primary" href="#">Registro de ingredientes</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-dark" href="#">Toma de Inventario</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-dark" href="#">Registro de lote</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-dark" href="#">Salida de lote</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-dark" href="#">Inventario</a>
+              </li>
+            </ul>
+          </div>
+    
+          <!-- Main Content -->
+          <div class="col-10 px-5 py-3">
+            <!-- Header -->
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center mb-4 pt-5 montserrat-bold">
+                    <p style="font-size: 38px !important;" >Registro de ingredientes</p>
+                </div>
+                <div class="row pb-5 montserrat-normal">
+                    <div class="col-auto pe-2">
+                        <img src="static\img\LogoRegistroAlmacenAzulLapiz.png" class="img-fluid">
+                    </div>
+                    <div class="col-auto ">
+                        <span class="text-muted">Datos de la operación</span>
+                    </div>
+                    <div class="col-7 text-center">
+                        <img src="static\img\LineaAzul.png" class="img-fluid" style="width: 600px;">
+                    </div>
+                    <div class="col-auto pe-2">
+                        <img src="static\img\GuardarLogoGris.png" class="img-fluid">
+                    </div>
+                    <div class="col-auto px-1">
+                        <p class="text-muted  text-right">Guardar</p>
+                    </div>           
+                </div>
+            </div>
+
+            <div class="container-fluid" id="labelContainer" style="display:none; margin-top: 20px; border: 2px solid #000; padding: 20px;">
+              <div class="row">
+                <div class="col"><p class="pe-0" style="background: none; border: none; font-size: 20px; cursor: pointer;padding-left: 180%;">cerrar</p></div>
+                <div class="col"> <button id="closeLabelBtn"  style="background: none; border: none; font-size: 20px; cursor: pointer;padding-left: 90%;">&times;</button></div>
+              </div>
+              <h3>Etiqueta del Producto</h3>
+              <p><strong>Nombre del Producto:</strong> <span id="productNameLabel">Nulo</span></p>
+              <p><strong>Número de Lote:</strong> <span id="batchNumberLabel">Nulo</span></p>
+              <p><strong>Proveedor:</strong> <span id="providerLabel">Nulo</span></p>
+              <p><strong>Cantidad:</strong> <span id="quantityLabel">Nulo</span></p>
+              <p><strong>Unidad:</strong> <span id="unitLabel">Nulo</span></p>
+              <p><strong>Ubicación de Almacenamiento:</strong> <span id="storageLabel">Nulo</span></p>
+              <p><strong>Detalles:</strong> <span id="detailsLabel">Nulo</span></p>
+            </div>
+          
+            <!-- Form Section -->
+            <div class="form-container mx-auto">
+              <div class="row p-3 mt-3 mb-3 pb-4">
+                <div class="col-10">
+                    <p style="font-size: 20px;">Datos del producto</p>
+                </div>
+                <div class="col montserrat-bold">
+                    <button type="button" class="btn btn-custom" id="printLabelBtn"><p style="font-size: 12px;">Imprimir etiqueta</p></button> 
+                </div>
+              </div>
+              <form action="/GuardarProducto" method="POST">
+                {% if error_message %}
+                    <div class="alert alert-danger" role="alert">
+                        <strong>Error:</strong> {{ error_message }}
+                    </div>
+                {% endif %}
+                <div class="row g-3  montserrat-normal">
+                  <div class="col-md-6">
+                    <input type="text" class="form-control form-style" id="productName" name="nombre_producto" placeholder="Nombre del producto">
+                  </div>
+                  <div class="col-md-6">
+                    <input type="text" class="form-control form-style" id="batchNumber" name="numero_lote" placeholder="Número de Lote">
+                  </div>
+                  <div class="col-md-6">
+                    <select class="form-select form-style" name="proveedor" id="provider">
+                      <option selected>Proveedor</option>
+                      {% for p in proveedores %}
+                        <option value="{{ p.ID }}">{{ p.Nombre }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="col-md-3">
+                    <input type="number" class="form-control form-style" name="cantidad"  id="Cantidad" placeholder="Cantidad">
+                  </div>
+                  <div class="col-md-3">
+                    <select class="form-select form-style" name="unidad" id="unit">
+                      <option selected>Unidad</option>
+                    </select>
+                  </div>
+                  <div class="col-md-12">
+                    <input type="text" class="form-control form-style" id="storage" name="ubicacion" placeholder="Ubicacion de almacenamiento">
+                  </div>
+                  <div class="col-md-12">
+                    <textarea class="form-control form-style" name="detalles" id="details" rows="3" >Detalles del ingrediente</textarea>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between mt-4">
+                  <button type="button" class="btn btn-outline-secondary" style="width: 108px; height: 33px; color: #000000;">Cancelar</button>
+                  <button type="submit" class="btn btn-primary btn-custom" style="width: 108px; height: 33px; ">Siguiente</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+       <!-- Script para mostrar la etiqueta -->
+       <script>
+        document.getElementById('printLabelBtn').addEventListener('click', function() {
+          // Obtener los valores del formulario
+          var nombreProducto = document.getElementById('productName').value || 'Nulo';
+          var numeroLote = document.getElementById('batchNumber').value || 'Nulo';
+          var proveedor = document.getElementById('provider').options[document.getElementById('provider').selectedIndex].text || 'Nulo';
+          var cantidad = document.getElementById('Cantidad').value || 'Nulo';
+          var unidad = document.getElementById('unit').options[document.getElementById('unit').selectedIndex].text || 'Nulo';
+          var ubicacion = document.getElementById('storage').value || 'Nulo';
+          var detalles = document.getElementById('details').value || 'Nulo';
+      
+          // Mostrar la etiqueta con los datos en el contenedor
+          document.getElementById('productNameLabel').innerText = nombreProducto;
+          document.getElementById('batchNumberLabel').innerText = numeroLote;
+          document.getElementById('providerLabel').innerText = proveedor;
+          document.getElementById('quantityLabel').innerText = cantidad;
+          document.getElementById('unitLabel').innerText = unidad;
+          document.getElementById('storageLabel').innerText = ubicacion;
+          document.getElementById('detailsLabel').innerText = detalles;
+      
+          // Hacer visible el contenedor de la etiqueta
+          document.getElementById('labelContainer').style.display = 'block';
+        });
+      
+        // Función para cerrar la ventana de la etiqueta
+        document.getElementById('closeLabelBtn').addEventListener('click', function() {
+          document.getElementById('labelContainer').style.display = 'none';
+        });
+      </script>
+</body>
+</html>

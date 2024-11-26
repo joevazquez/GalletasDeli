@@ -1,0 +1,67 @@
+body {
+    background-color: #F1F2F7; /* Fondo general */
+  }
+  .sidebar {
+    background-color: #ffffff;
+    border-right: 1px solid #e6e8eb;
+  }
+  .form-container {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+
+  .guardar-container {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    margin: 0 200px;
+  }
+  .nav-icon {
+    width: 30px;
+    height: 30px;
+    background-color: #e6e8eb;
+    border-radius: 50%;
+  }
+  .btn-custom {
+    background-color: #0D3473; /* Color azul oscuro */
+    color: white; /* Texto blanco */
+    font-size: 14px; /* Tamaño de fuente */
+    font-weight: 500; /* Peso medio */
+    border-radius: 5px; /* Bordes redondeados */
+    border: none; /* Sin borde */
+    text-align: center;
+    width: 108px;
+    height: 50px;
+  }
+
+.montserrat-normal {
+  font-family: "Montserrat", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  size: 10px;
+  letter-spacing: 0.5px;
+}
+
+.montserrat-bold {
+  font-family: "Montserrat", serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+  size: 10px;
+  letter-spacing: 0.5px;
+}
+
+.form-style {
+  font-size: 10px !important;
+  padding: 15px;
+}
+
+.envoltura-sidebar{
+  background-color: #EEEEEE;
+  padding: 10px;
+  border-radius: 10px;
+}
