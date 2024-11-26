@@ -1,4 +1,5 @@
 import sqlite3
+import jsonify
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 
 app = Flask(__name__)
@@ -185,25 +186,90 @@ def authenticate():
         flash("Error al determinar el tipo de usuario.", "danger")
         return redirect(url_for("login"))
 
-
-@app.route('/catalogo_productos')
+@app.route('/catalogo_productos', methods=['GET', 'POST'])
 def catalogo_productos():
-    # Verifica si el usuario está autenticado y es cliente
-    if 'user_id' not in session or session.get('user_type') != 'cliente':
-        flash('Acceso no autorizado. Por favor, inicie sesión como cliente.', 'danger')
-        return redirect(url_for('login'))
-
-    # Recupera el nombre del cliente de la sesión
-    user_name = session.get('user_name', 'Usuario')  # Valor por defecto: 'Usuario'
-
-    # Renderiza la página del catálogo y pasa el nombre del usuario
-    return render_template('Catalogo/catalogo-productos.html', user_name=user_name)
+    if request.method == 'POST':
+        resumen_pedido = request.form.get('resumenPedido')
+        total_pedido = request.form.get('totalPedido')
+        
+        # Guarda los datos en la sesión
+        session['resumen_pedido'] = resumen_pedido
+        session['total_pedido'] = total_pedido
+        
+        return redirect(url_for('direcciones'))
+    return render_template('Catalogo/catalogo-productos.html', user_name=session.get('user_name'))
 
 
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+@app.route('/direcciones', methods=['GET', 'POST'])
+def direcciones():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("Por favor, inicia sesión.", "danger")
+        return redirect(url_for('login'))
 
+    conn = get_db_connection()
+
+    # Cargar la dirección actual desde la base de datos
+    direccion = conn.execute(
+        "SELECT Direccion FROM Clientes WHERE ID_cliente = ?",
+        (user_id,)
+    ).fetchone()
+
+    direccion = direccion["Direccion"] if direccion and direccion["Direccion"] else None
+
+    # Manejar actualización de dirección
+    if request.method == 'POST':
+        estado = request.form['estado']
+        ciudad = request.form['ciudad']
+        delegacion = request.form['delegacion']
+        colonia = request.form['colonia']
+        calle_numero = request.form['calle_numero']
+
+        # Concatenar la dirección completa
+        direccion_completa = f"{estado}, {ciudad}, {delegacion}, {colonia}, {calle_numero}"
+
+        # Actualizar la dirección en la base de datos
+        conn.execute(
+            "UPDATE Clientes SET Direccion = ? WHERE ID_cliente = ?",
+            (direccion_completa, user_id)
+        )
+        conn.commit()
+
+        flash("Dirección actualizada con éxito.", "success")
+        return redirect(url_for('direcciones'))
+
+    conn.close()
+
+    # Renderizar el HTML con la dirección actual
+    return render_template(
+        'direcciones/direcciones.html',
+        direccion=direccion,
+        user_name=session.get('user_name', 'Usuario'),
+        resumen_pedido=session.get('resumen_pedido', ''),
+        total_pedido=session.get('total_pedido', 0)
+    )
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@app.route('/actualizar_direccion', methods=['POST'])
+def actualizar_direccion():
+    data = request.get_json()
+    user_id = session.get('user_id')
+    
+    nueva_direccion = f"{data['estado']}, {data['ciudad']}, {data['delegacion']}, {data['colonia']}, {data['calle_numero']}"
+    
+    conn = get_db_connection()
+    conn.execute(
+        "UPDATE Clientes SET Direccion = ? WHERE ID_cliente = ?",
+        (nueva_direccion, user_id)
+    )
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'success': True})
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
 

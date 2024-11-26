@@ -131,14 +131,18 @@
                 <!-- Actualización dinámica del pedido -->
             </div>
             <p class="total" id="order-total">Total: $0.00</p>
-            <button class="btn-order" onclick="redirigirAPago()">Ordenar</button>
+
+            <!-- Redirigir a la página de direcciones -->
+            <form action="{{ url_for('direcciones') }}" method="GET">
+                <input type="hidden" name="resumenPedido" id="resumenPedido">
+                <input type="hidden" name="totalPedido" id="totalPedido">
+                <button type="submit" class="btn-order">Ordenar</button>
+            </form>
         </div>
-        
     </div>
 
-    <!-- Scripts -->
     <script>
-        const prices = { "half-kilo": 100, "six-pieces": 50 }; // Precios de cada tipo de producto
+        const prices = { "half-kilo": 100, "six-pieces": 50 }; // Precios por tipo de producto
         const orderSummary = {}; // Resumen del pedido
 
         // Actualiza los contadores y el resumen del pedido
@@ -147,7 +151,7 @@
             const counterElement = document.getElementById(counterId);
             let count = parseInt(counterElement.textContent, 10);
 
-            // Actualiza el contador si es mayor o igual a 0
+            // Asegúrate de que el contador nunca sea negativo
             count = Math.max(0, count + change);
             counterElement.textContent = count;
 
@@ -160,20 +164,19 @@
             updateOrderSummary();
         }
 
-        // Actualiza el HTML del resumen del pedido
         function updateOrderSummary() {
             const orderDetails = document.getElementById("order-details");
             const orderTotal = document.getElementById("order-total");
             let total = 0;
 
-            orderDetails.innerHTML = ""; // Limpia el resumen previo
+            orderDetails.innerHTML = ""; // Limpia el contenido anterior
 
             for (const [product, quantities] of Object.entries(orderSummary)) {
                 const { "half-kilo": halfKilo, "six-pieces": sixPieces } = quantities;
 
                 if (halfKilo > 0 || sixPieces > 0) {
                     orderDetails.innerHTML += `
-                        <p><strong>${capitalize(product)}</strong></p>
+                        <p><strong>${capitalize(product)}:</strong></p>
                         ${halfKilo > 0 ? `<p>Cajas de medio kilo: ${halfKilo}</p>` : ""}
                         ${sixPieces > 0 ? `<p>Cajas de 6 piezas: ${sixPieces}</p>` : ""}
                     `;
@@ -182,26 +185,13 @@
             }
 
             orderTotal.textContent = `Total: $${total.toFixed(2)}`;
+            document.getElementById("resumenPedido").value = orderDetails.innerHTML;
+            document.getElementById("totalPedido").value = total.toFixed(2);
         }
 
-        // Capitaliza la primera letra del producto
         function capitalize(str) {
             return str.charAt(0).toUpperCase() + str.slice(1);
         }
-
-        function redirigirAPago() {
-            // Capturar los detalles del pedido desde la página
-            const resumenPedido = document.getElementById("order-details").innerHTML;
-            const totalPedido = document.getElementById("order-total").textContent.replace("Total: $", "");
-
-            // Guardar los datos en localStorage
-            localStorage.setItem("resumenPedido", resumenPedido);
-            localStorage.setItem("totalPedido", totalPedido);
-
-            // Redirigir a la página de pago
-            window.location.href = "Direcciones_pago/pago";
-        }
-
     </script>
 </body>
 </html>
