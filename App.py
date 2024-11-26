@@ -9,9 +9,8 @@ DATABASE = "Database/GalletasDeliDB.db"
 
 
 def get_db_connection():
-    """Conecta a la base de datos SQLite."""
     conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row  # Permite acceder a las filas como diccionarios
+    conn.row_factory = sqlite3.Row  # Permite acceder a los resultados como diccionarios
     return conn
 
 
@@ -120,7 +119,6 @@ def register_empleado():
     # Renderizar el formulario de registro de empleados
     return render_template("Inicio_sesion/register_empleado.html")
 
-
 @app.route("/authenticate", methods=["POST"])
 def authenticate():
     username = request.form.get("username")
@@ -132,19 +130,17 @@ def authenticate():
 
     conn = get_db_connection()
 
-    if (
-        es_empleado == "1"
-    ):  # Si el checkbox está marcado, verificar en la tabla de empleados
+    if es_empleado == "1":  # Si el checkbox está marcado, verificar en la tabla de empleados
         print("Consultando en tabla Empleado...")
         user = conn.execute(
             """
             SELECT ID_empleado AS id, Rol AS role
             FROM Empleado
             WHERE User = ? AND Contrasena = ?
-        """,
+            """,
             (username, contrasena),
         ).fetchone()
-        print("Resultado:", user)
+        print("Resultado:", dict(user) if user else None)
 
         if user:
             # Usuario autenticado como empleado
@@ -159,19 +155,17 @@ def authenticate():
             flash("Usuario o contraseña incorrectos.", "danger")
             conn.close()
             return redirect(url_for("login"))
-    elif (
-        es_empleado == "0"
-    ):  # Si el checkbox no está marcado, verificar en la tabla de clientes
+    elif es_empleado == "0":  # Si el checkbox no está marcado, verificar en la tabla de clientes
         print("Consultando en tabla Clientes...")
         user = conn.execute(
             """
             SELECT ID_cliente AS id, Nombre AS name
             FROM Clientes
             WHERE User = ? AND Contrasena = ?
-        """,
+            """,
             (username, contrasena),
         ).fetchone()
-        print("Resultado:", user)
+        print("Resultado:", dict(user) if user else None)
 
         if user:
             # Usuario autenticado como cliente
@@ -192,6 +186,27 @@ def authenticate():
         return redirect(url_for("login"))
 
 
+@app.route('/catalogo_productos')
+def catalogo_productos():
+    # Verifica si el usuario está autenticado y es cliente
+    if 'user_id' not in session or session.get('user_type') != 'cliente':
+        flash('Acceso no autorizado. Por favor, inicie sesión como cliente.', 'danger')
+        return redirect(url_for('login'))
+
+    # Recupera el nombre del cliente de la sesión
+    user_name = session.get('user_name', 'Usuario')  # Valor por defecto: 'Usuario'
+
+    # Renderiza la página del catálogo y pasa el nombre del usuario
+    return render_template('Catalogo/catalogo-productos.html', user_name=user_name)
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 @app.route("/dashboard")
 def dashboard():
     if "user_id" not in session or session.get("user_type") != "empleado":
@@ -200,21 +215,6 @@ def dashboard():
 
     user_role = session.get("user_role")
     return f"Bienvenido al panel de empleados. Rol: {user_role}."
-
-
-@app.route("/catalogo_productos")
-def catalogo_productos():
-    # Verifica si el usuario está autenticado y es cliente
-    if "user_id" not in session or session.get("user_type") != "cliente":
-        flash("Acceso no autorizado. Por favor, inicie sesión como cliente.", "danger")
-        return redirect(url_for("login"))
-
-    # Recupera el nombre del cliente de la sesión
-    user_name = session.get("user_name", "Usuario")  # Valor por defecto: 'Usuario'
-
-    # Renderiza la página del catálogo y pasa el nombre del usuario
-    return render_template("Catalogo/catalogo-productos.html", user_name=user_name)
-
 
 @app.route("/dashboard-ventas")
 def dashboard_ventas():

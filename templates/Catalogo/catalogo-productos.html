@@ -131,7 +131,7 @@
                 <!-- Actualización dinámica del pedido -->
             </div>
             <p class="total" id="order-total">Total: $0.00</p>
-            <button class="btn-order">Ordenar</button>
+            <button class="btn-order" onclick="redirigirAPago()">Ordenar</button>
         </div>
         
     </div>
@@ -188,6 +188,20 @@
         function capitalize(str) {
             return str.charAt(0).toUpperCase() + str.slice(1);
         }
+
+        function redirigirAPago() {
+            // Capturar los detalles del pedido desde la página
+            const resumenPedido = document.getElementById("order-details").innerHTML;
+            const totalPedido = document.getElementById("order-total").textContent.replace("Total: $", "");
+
+            // Guardar los datos en localStorage
+            localStorage.setItem("resumenPedido", resumenPedido);
+            localStorage.setItem("totalPedido", totalPedido);
+
+            // Redirigir a la página de pago
+            window.location.href = "Direcciones_pago/pago";
+        }
+
     </script>
 </body>
 </html>
