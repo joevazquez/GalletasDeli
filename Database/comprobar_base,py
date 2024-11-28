@@ -1,0 +1,49 @@
+import sqlite3
+import os
+
+# Ruta a la base de datos
+db_path = os.path.join('Database', 'GalletasDeliDB.db')
+
+def listar_usuarios():
+    """Consulta todos los clientes y empleados de la base de datos y los imprime."""
+    if not os.path.exists(db_path):
+        print("La base de datos no existe en la ruta especificada.")
+        return
+
+    try:
+        # Conectar a la base de datos
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+
+        # Consultar clientes
+        print("Clientes en la base de datos:")
+        cursor.execute("SELECT ID_cliente, User, Nombre, Direccion, Telefono, Email FROM Clientes")
+        clientes = cursor.fetchall()
+        if clientes:
+            for cliente in clientes:
+                print(f"ID: {cliente[0]}, Usuario: {cliente[1]}, Nombre: {cliente[2]}, Dirección: {cliente[3]}, Teléfono: {cliente[4]}, Email: {cliente[5]}")
+        else:
+            print("No hay clientes registrados en la base de datos.")
+
+        print("\n" + "="*50 + "\n")
+
+        # Consultar empleados
+        print("Empleados en la base de datos:")
+        cursor.execute("SELECT ID_empleado, User, Nombre, Direccion, Rol FROM Empleado")
+        empleados = cursor.fetchall()
+        if empleados:
+            for empleado in empleados:
+                print(f"ID: {empleado[0]}, Usuario: {empleado[1]}, Nombre: {empleado[2]}, Dirección: {empleado[3]}, Rol: {empleado[4]}")
+        else:
+            print("No hay empleados registrados en la base de datos.")
+
+    except sqlite3.Error as e:
+        print(f"Error al consultar la base de datos: {e}")
+    finally:
+        # Cerrar la conexión
+        if conn:
+            conn.close()
+
+# Ejecutar la función
+if __name__ == "__main__":
+    listar_usuarios()

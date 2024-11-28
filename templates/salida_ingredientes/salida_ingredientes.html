@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salida de Ingredientes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/salida-ingredientes.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <!-- Sidebar -->
+            <div class="col-2 sidebar p-3 vh-100">
+                <div class="text-center mb-4">
+                    <p class="user-role">{{ session.get('user_name', 'Usuario') }}</p>
+                    <p class="user-organization">{{ session.get('user_role', 'Rol no definido') }}</p>
+                </div>
+                <ul class="nav flex-column pt-4">
+                    <li class="nav-item">
+                      <a class="nav-link active" href="{{ url_for('almacenista_dashboard') }}">Registro de ingredientes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('salida_ingredientes') }}">Salida de Ingredientes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('registro_lote') }}">Registro de lote</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Salida de lote</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('inventario') }}">Inventario</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-10 px-5 py-3">
+                <div class="header mb-4">
+                    <h1 class="title">Salida de ingredientes</h1>
+                </div>
+
+                <!-- Tabla de ingredientes -->
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="tablaIngredientes">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Seleccionar</th>
+                                <th>ID</th>
+                                <th>Fecha Ingreso</th>
+                                <th>Estado</th>
+                                <th>Nombre</th>
+                                <th>Proveedor</th>
+                                <th>No. de Lote</th>
+                                <th>Cantidad</th>
+                                <th>Unidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ingrediente in ingredientes %}
+                            <tr data-id="{{ ingrediente.ID }}">
+                                <td><input type="radio" name="seleccionIngrediente" value="{{ ingrediente.ID }}"></td>
+                                <td>{{ ingrediente.ID }}</td>
+                                <td>{{ ingrediente.Fecha_ingreso }}</td>
+                                <td>
+                                    {% if ingrediente.Cantidad < 5 %}
+                                    <span class="badge bg-danger">POCO</span>
+                                    {% elif ingrediente.Cantidad < 20 %}
+                                    <span class="badge bg-warning">MEDIO</span>
+                                    {% else %}
+                                    <span class="badge bg-success">SUFICIENTE</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ ingrediente.Nombre }}</td>
+                                <td>{{ ingrediente.Proveedor }}</td>
+                                <td>{{ ingrediente.Numero_lote }}</td>
+                                <td>{{ ingrediente.Cantidad }}</td>
+                                <td>{{ ingrediente.Unidad }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Botón siguiente -->
+                <div class="text-end mt-4">
+                    <button id="btnSiguiente" class="btn btn-primary" disabled>Siguiente</button>
+                </div>
+
+                <!-- Modal de confirmación -->
+                <div id="modalConfirmacion" class="modal" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Confirmación</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>¿Confirma el registro de la salida de ingredientes?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button id="btnRegistrar" class="btn btn-primary">Registrar salida</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('tablaIngredientes').addEventListener('change', function () {
+            document.getElementById('btnSiguiente').disabled = false;
+        });
+
+        document.getElementById('btnSiguiente').addEventListener('click', function () {
+            const modal = new bootstrap.Modal(document.getElementById('modalConfirmacion'));
+            modal.show();
+        });
+
+        document.getElementById('btnRegistrar').addEventListener('click', function () {
+            // Obtener el ID del lote seleccionado
+            const selectedRow = document.querySelector('input[name="seleccionIngrediente"]:checked');
+            if (!selectedRow) {
+                alert("Por favor, seleccione un ingrediente para registrar la salida.");
+                return;
+            }
+
+            const loteID = selectedRow.value;
+
+            // Enviar la solicitud al servidor para registrar la salida
+            fetch(`/registrar_salida/${loteID}`, { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Eliminar la fila seleccionada de la tabla
+                        const rowToRemove = document.querySelector(`tr[data-id="${loteID}"]`);
+                        if (rowToRemove) {
+                            rowToRemove.remove();
+                        }
+
+                        // Limpiar selección y deshabilitar botón siguiente
+                        document.querySelectorAll('input[name="seleccionIngrediente"]').forEach(input => input.checked = false);
+                        document.getElementById('btnSiguiente').disabled = true;
+
+                        // Ocultar modal y mostrar mensaje de éxito
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalConfirmacion'));
+                        modal.hide();
+                        alert("¡Se registró con éxito la salida de ingredientes!");
+                    } else {
+                        alert("Hubo un error al registrar la salida. Intente nuevamente.");
+                    }
+                })
+                .catch(error => {
+                    alert("Hubo un problema con la solicitud. Intente nuevamente.");
+                });
+        });
+    </script>
+</body>
+</html>

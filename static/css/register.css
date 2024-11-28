@@ -12,74 +12,80 @@ body {
 /* Contenedor principal */
 .register-container {
     background-color: #ffffff; /* Fondo blanco */
-    padding: 20px 30px;
-    border-radius: 15px;
+    padding: 30px;
+    border-radius: 20px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     text-align: center;
     width: 100%;
-    max-width: 500px;
+    max-width: 600px;
 }
 
 /* Header */
 .header {
     background-color: #a5d8ff; /* Fondo azul claro */
-    padding: 10px 0;
+    padding: 15px 0;
+    border-radius: 15px 15px 0 0;
     margin-bottom: 20px;
-    border-radius: 10px 10px 0 0;
 }
 
 .header .logo {
-    width: 50px;
+    width: 60px;
     display: block;
     margin: 0 auto;
 }
 
-.header h1 {
-    color: #333333; /* Texto oscuro */
-    font-size: 22px;
-    margin: 5px 0;
+.header h2 {
+    color: #6a4c93; /* Texto morado */
+    font-size: 24px;
+    margin: 10px 0;
     font-weight: bold;
 }
 
-.header h2 {
-    color: #6a4c93; /* Texto morado */
-    font-size: 18px;
-    margin: 5px 0;
-}
-
 /* Formulario */
-.register-form {
+form {
     display: flex;
-    flex-direction: column;
-    gap: 15px; /* Espaciado entre los campos */
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
 }
 
-.register-form input {
-    width: 100%;
+form label {
+    display: none; /* Ocultar etiquetas */
+}
+
+form input, form select {
+    width: 48%; /* La mitad del ancho del contenedor */
     padding: 10px;
     border: 2px solid #1c3f72; /* Borde azul oscuro */
-    border-radius: 20px; /* Bordes redondeados */
+    border-radius: 25px; /* Bordes redondeados */
     font-size: 14px;
     box-sizing: border-box;
     outline: none;
 }
 
-.register-form input:focus {
+form input:focus, form select:focus {
     border-color: #6a4c93; /* Borde morado al enfocar */
 }
 
+/* Campo especial */
+form input[type="password"] {
+    width: 100%; /* Contraseña ocupa todo el ancho */
+}
+
 /* Botón */
-.btn-register {
+form button {
     background-color: #4c2b19; /* Marrón oscuro */
     color: white;
     border: none;
     padding: 10px 20px;
     font-size: 16px;
-    border-radius: 20px;
+    border-radius: 25px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    width: 100%; /* Botón ocupa todo el ancho */
 }
 
-.btn-register:hover {
+form button:hover {
     background-color: #3a2214; /* Marrón más oscuro */
 }

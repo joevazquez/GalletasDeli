@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro Empleado - Galletas Deli</title>
+    <title>Registro de Empleado - Galletas Deli</title>
     <link rel="stylesheet" href="/static/css/register.css">
 </head>
 <body>
@@ -12,18 +12,25 @@
             <img src="/static/images/logo_ventas.png" alt="Logo Galletas Deli" class="logo">
             <h2>Registro de Empleado</h2>
         </div>
-        <form action="/register_empleado" method="POST" class="register-form">
+        <form action="{{ url_for('register_empleado') }}" method="POST" class="register-form">
             <input type="text" name="nombre" placeholder="Nombre(s)" required>
             <input type="text" name="apellido" placeholder="Apellido(s)" required>
             <input type="text" name="user" placeholder="Nombre de Usuario" required>
             <input type="text" name="estado" placeholder="Estado" required>
             <input type="text" name="ciudad" placeholder="Ciudad" required>
             <input type="text" name="calle_numero" placeholder="Calle y Número" required>
-            <input type="tel" name="telefono" placeholder="Teléfono" required>
-            <input type="text" name="rol" placeholder="Posición o Rol" required>
+            <select id="rol" name="rol" required>
+                <option value="" disabled selected>Selecciona un rol</option>
+                <option value="Almacenista">Almacenista</option>
+                <option value="Administrador">Administrador</option>
+                <option value="Producción">Producción</option>
+                <option value="Ventas">Ventas</option>
+                <option value="QA">QA</option>
+            </select>
             <input type="password" name="contrasena" placeholder="Contraseña" required>
             <button type="submit" class="btn-register">Registrar</button>
         </form>
+        
     </div>
 </body>
 </html>

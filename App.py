@@ -16,17 +16,20 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row  # Permite acceder a los resultados como diccionarios
     return conn
 
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 @app.route("/")
 def home():
     return redirect(url_for("login"))
 
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 @app.route("/login", methods=["GET"])
 def login():
     # Renderiza el HTML del inicio de sesión
     return render_template("Inicio_sesion/login.html")
 
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -75,11 +78,11 @@ def register():
     # Renderizar el formulario de registro inicial
     return render_template("Inicio_sesion/register.html")
 
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 @app.route("/register_empleado", methods=["GET", "POST"])
 def register_empleado():
     if request.method == "POST":
-        # Procesar el registro de empleado
         nombre = request.form["nombre"]
         apellido = request.form["apellido"]
         user = request.form["user"]
@@ -87,78 +90,86 @@ def register_empleado():
         ciudad = request.form["ciudad"]
         calle_numero = request.form["calle_numero"]
         rol = request.form["rol"]
-        contrasena = request.form["contrasena"]
+        contrasena = request.form.get("contrasena")  # Capturar contraseña correctamente
 
-        # Concatenar los campos de dirección
+        # Depurar
+        print(f"Contraseña recibida: {contrasena}")
+
         direccion = f"{calle_numero}, {ciudad}, {estado}"
-
-        # Validar si el nombre de usuario ya existe
         conn = get_db_connection()
-        usuario_existente = conn.execute(
-            "SELECT 1 FROM Empleado WHERE User = ?", (user,)
-        ).fetchone()
-
-        if usuario_existente:
-            flash(
-                "El nombre de usuario ya está en uso. Por favor elige otro.", "danger"
+        try:
+            conn.execute(
+                """
+                INSERT INTO Empleado (Nombre, Direccion, User, Rol, Contrasena)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (f"{nombre} {apellido}", direccion, user, rol, contrasena),
             )
+            conn.commit()
+            flash("Registro de empleado exitoso. Por favor, inicie sesión.", "success")
+        except sqlite3.Error as e:
+            print(f"Error al insertar en la base de datos: {e}")
+            flash("Ocurrió un error al registrar el empleado.", "danger")
+        finally:
             conn.close()
-            return redirect(url_for("register_empleado"))
 
-        # Insertar los datos del empleado
-        conn.execute(
-            """
-            INSERT INTO Empleado (User, Direccion, Rol, Contrasena)
-            VALUES (?, ?, ?, ?)
-        """,
-            (user, direccion, rol, contrasena),
-        )
-        conn.commit()
-        conn.close()
-
-        flash("Registro de empleado exitoso. Por favor, inicie sesión.", "success")
         return redirect(url_for("login"))
 
-    # Renderizar el formulario de registro de empleados
     return render_template("Inicio_sesion/register_empleado.html")
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 @app.route("/authenticate", methods=["POST"])
 def authenticate():
     username = request.form.get("username")
     contrasena = request.form.get("password")
-    es_empleado = request.form.get("es_empleado")  # Valor enviado como '0' o '1'
+    es_empleado = request.form.get("es_empleado")  # Valor enviado como 'on' o None
 
     print("Datos recibidos:")
     print(f"Usuario: {username}, Contraseña: {contrasena}, Es empleado: {es_empleado}")
 
     conn = get_db_connection()
 
-    if es_empleado == "1":  # Si el checkbox está marcado, verificar en la tabla de empleados
+    if es_empleado:  # Si el checkbox está marcado, verificar en la tabla de empleados
         print("Consultando en tabla Empleado...")
         user = conn.execute(
             """
-            SELECT ID_empleado AS id, Rol AS role
+            SELECT ID_empleado AS id, Rol AS role, Nombre AS name
             FROM Empleado
             WHERE User = ? AND Contrasena = ?
             """,
             (username, contrasena),
         ).fetchone()
-        print("Resultado:", dict(user) if user else None)
 
         if user:
+            print("Resultado en tabla Empleado:", dict(user))
             # Usuario autenticado como empleado
             session["user_type"] = "empleado"
             session["user_id"] = user["id"]
+            session["direccion"] = user["direccion"]
             session["user_role"] = user["role"]
+            session["user_name"] = user["name"]
             conn.close()
-            return render_template(
-                "hola_mundo.html", role=user["role"]
-            )  # Mostrar "Hola mundo"
+
+            # Redirigir según el rol
+            if user["role"].lower() == "almacenista":
+                return redirect(url_for("almacenista_dashboard"))
+            elif user["role"].lower() == "administrador":
+                return redirect(url_for("admin_dashboard"))
+            elif user["role"].lower() == "produccion":
+                return redirect(url_for("produccion_dashboard"))
+            elif user["role"].lower() == "qa":
+                return redirect(url_for("qa_dashboard"))
+            else:
+                flash("Rol no reconocido.", "warning")
+                return redirect(url_for("login"))
         else:
+            print("Empleado no encontrado.")
             flash("Usuario o contraseña incorrectos.", "danger")
             conn.close()
             return redirect(url_for("login"))
-    elif es_empleado == "0":  # Si el checkbox no está marcado, verificar en la tabla de clientes
+
+    else:  # Si el checkbox no está marcado, verificar en la tabla de clientes
         print("Consultando en tabla Clientes...")
         user = conn.execute(
             """
@@ -168,25 +179,21 @@ def authenticate():
             """,
             (username, contrasena),
         ).fetchone()
-        print("Resultado:", dict(user) if user else None)
 
         if user:
+            print("Resultado en tabla Clientes:", dict(user))
             # Usuario autenticado como cliente
             session["user_type"] = "cliente"
             session["user_id"] = user["id"]
             session["user_name"] = user["name"]
             conn.close()
-            return render_template(
-                "Catalogo/catalogo-productos.html", user_name=user["name"]
-            )
+            return redirect(url_for("catalogo_productos"))
         else:
+            print("Cliente no encontrado.")
             flash("Usuario o contraseña incorrectos.", "danger")
             conn.close()
             return redirect(url_for("login"))
-    else:
-        # Caso inesperado
-        flash("Error al determinar el tipo de usuario.", "danger")
-        return redirect(url_for("login"))
+
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -211,7 +218,6 @@ def catalogo_productos():
         total_pedido=session.get('total_pedido', 0),
         user_name=session.get('user_name', 'Usuario')
     )
-
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -454,17 +460,302 @@ def dashboard():
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+@app.route("/almacenista_dashboard")
+def almacenista_dashboard():
+    # Verifica que el usuario esté autenticado como empleado y que sea almacenista
+    if "user_id" not in session or session.get("user_role") != "Almacenista":
+        flash("Acceso no autorizado. Por favor, inicie sesión como almacenista.", "danger")
+        return redirect(url_for("login"))
+
+    # Aquí puedes incluir lógica adicional para cargar datos como proveedores, etc.
+    conn = get_db_connection()
+    proveedores = conn.execute("SELECT ID, Nombre FROM Proveedores").fetchall()
+    conn.close()
+
+    return render_template("registro-ingedientes/registro-ingedientes.html", proveedores=proveedores)
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+@app.route("/guardar_ingrediente", methods=["POST"])
+def guardar_ingrediente():
+    try:
+        # Obtener los datos del formulario
+        nombre_producto = request.form.get("nombre_producto")
+        numero_lote = request.form.get("numero_lote")
+        proveedor = request.form.get("proveedor")
+        cantidad = request.form.get("cantidad")
+        unidad = request.form.get("unidad")
+        ubicacion = request.form.get("ubicacion")
+        detalles = request.form.get("detalles")
+        fecha_ingreso = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Fecha actual
+        materia_prima_id = 1  # Suponiendo que el ID de materia prima sea fijo por ahora
+        fecha_caducidad = None  # Si no tienes este dato en el formulario
 
+        # Validar campos obligatorios
+        if not (nombre_producto and numero_lote and proveedor and cantidad and unidad and ubicacion):
+            return jsonify({"success": False, "error": "Todos los campos son obligatorios."}), 400
+
+        # Convertir cantidad a entero
+        try:
+            cantidad = int(cantidad)
+        except ValueError:
+            return jsonify({"success": False, "error": "La cantidad debe ser un número entero válido."}), 400
+
+        # Guardar en la base de datos
+        conn = get_db_connection()
+        conn.execute(
+            """
+            INSERT INTO Lotes (Fecha_ingreso, Materia_prima_ID, Cantidad, Fecha_caducidad, Nombre, Numero_lote, Proveedor, Unidad, Ubicacion, Detalles)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (fecha_ingreso, materia_prima_id, cantidad, fecha_caducidad, nombre_producto, numero_lote, proveedor, unidad, ubicacion, detalles),
+        )
+        conn.commit()
+        conn.close()
+
+        return jsonify({"success": True}), 200
+
+    except Exception as e:
+        print(f"Error al guardar ingrediente: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@app.route("/salida_ingredientes", methods=["GET"])
+def salida_ingredientes():
+    # Verifica que el usuario esté autenticado como empleado y que sea almacenista
+    if "user_id" not in session or session.get("user_role") != "Almacenista":
+        flash("Acceso no autorizado. Por favor, inicie sesión como almacenista.", "danger")
+        return redirect(url_for("login"))
+
+    # Consulta los ingredientes de la base de datos
+    conn = get_db_connection()
+    ingredientes = conn.execute(
+        """
+        SELECT ID, Fecha_ingreso, Nombre, Proveedor, Numero_lote, Cantidad, Unidad
+        FROM Lotes
+        """
+    ).fetchall()
+    conn.close()
+
+    # Renderiza la página con los datos obtenidos
+    return render_template("salida_ingredientes/salida_ingredientes.html", ingredientes=ingredientes)
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@app.route("/registrar_salida/<int:lote_id>", methods=["POST"])
+def registrar_salida(lote_id):
+    try:
+        # Conectar a la base de datos
+        conn = get_db_connection()
+
+        # Eliminar el lote correspondiente
+        conn.execute("DELETE FROM Lotes WHERE ID = ?", (lote_id,))
+        conn.commit()
+        conn.close()
+
+        # Devolver una respuesta JSON de éxito
+        return jsonify({"success": True}), 200
+    except Exception as e:
+        # En caso de error, devolver un mensaje JSON de error
+        return jsonify({"success": False, "error": str(e)}), 500
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@app.route("/registro_lote", methods=["GET", "POST"])
+def registro_lote():
+    # Verifica que el usuario esté autenticado y sea un empleado autorizado
+    if "user_id" not in session or session.get("user_role") not in ["Almacenista", "Administrador"]:
+        flash("Acceso no autorizado. Por favor, inicie sesión como usuario autorizado.", "danger")
+        return redirect(url_for("login"))
+    
+    if request.method == "POST":
+        try:
+            # Obtener datos del formulario
+            tipo_lote = request.form.get("tipo_lote")
+            cantidad = request.form.get("cantidad")
+            fecha_ingreso = request.form.get("fecha_ingreso")
+            fecha_caducidad = request.form.get("fecha_caducidad")
+            ubicacion = request.form.get("ubicacion")
+            detalles = request.form.get("detalles")
+            
+            # Validar datos obligatorios
+            if not all([tipo_lote, cantidad, fecha_ingreso, ubicacion]):
+                return jsonify({"success": False, "error": "Todos los campos obligatorios deben estar llenos."}), 400
+            
+            # Guardar datos en la base de datos
+            conn = get_db_connection()
+            conn.execute(
+                """
+                INSERT INTO Lotes (Fecha_ingreso, Fecha_caducidad, Materia_prima_ID, Cantidad, Ubicacion, Detalles, Nombre)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (fecha_ingreso, fecha_caducidad, None, cantidad, ubicacion, detalles, tipo_lote)
+            )
+            conn.commit()
+            conn.close()
+            
+            return jsonify({"success": True}), 200
+        except Exception as e:
+            return jsonify({"success": False, "error": str(e)}), 500
+
+    # Renderizar el HTML para registro de lotes
+    return render_template("registro-lotes/registro-lotes.html")
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@app.route("/guardar_lote", methods=["POST"])
+def guardar_lote():
+    try:
+        # Obtener datos del formulario
+        tipo_lote = request.form.get("tipo_lote")  # Nombre de la materia prima
+        cantidad = request.form.get("cantidad")
+        fecha_ingreso = request.form.get("fecha_ingreso")
+        fecha_caducidad = request.form.get("fecha_caducidad")
+        ubicacion = request.form.get("ubicacion")
+        detalles = request.form.get("detalles")
+
+        # Validar campos obligatorios
+        if not all([tipo_lote, cantidad, fecha_ingreso, ubicacion]):
+            return jsonify({"success": False, "error": "Todos los campos obligatorios deben completarse."})
+
+        # Conexión a la base de datos
+        conn = get_db_connection()
+
+        # Generar automáticamente un nuevo ID para Materia_prima_ID
+        last_id_row = conn.execute("SELECT MAX(Materia_prima_ID) FROM Lotes").fetchone()
+        materia_prima_id = (last_id_row[0] or 0) + 1  # Incrementar el último ID encontrado
+        print(f"Nuevo Materia_prima_ID generado: {materia_prima_id}")  # Depuración
+
+        # Insertar el lote en la tabla Lotes
+        conn.execute(
+            """
+            INSERT INTO Lotes (Fecha_ingreso, Fecha_caducidad, Cantidad, Ubicacion, Detalles, Materia_prima_ID)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (fecha_ingreso, fecha_caducidad, cantidad, ubicacion, detalles, materia_prima_id),
+        )
+        conn.commit()
+        conn.close()
+
+        print(f"Lote insertado correctamente: Materia_prima_ID={materia_prima_id}")
+        return jsonify({"success": True, "message": "¡El lote se registró con éxito!"})
+
+    except Exception as e:
+        print(f"Error al registrar el lote: {e}")
+        return jsonify({"success": False, "error": str(e)})
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@app.route("/salida_lotes", methods=["GET"])
+def salida_lotes():
+    # Verifica que el usuario esté autenticado como empleado y que sea almacenista
+    if "user_id" not in session or session.get("user_role") != "Almacenista":
+        flash("Acceso no autorizado. Por favor, inicie sesión como almacenista.", "danger")
+        return redirect(url_for("login"))
+
+    # Consulta los lotes de la base de datos
+    conn = get_db_connection()
+    lotes = conn.execute(
+        """
+        SELECT ID, Fecha_ingreso, Nombre AS Tipo, Cantidad, Unidad, Ubicacion
+        FROM Lotes
+        """
+    ).fetchall()
+    conn.close()
+
+    # Renderiza la página con los datos obtenidos
+    return render_template("salida_lotes/salida_lotes.html", lotes=lotes)
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@app.route("/registrar_salida_lotes/<int:lote_id>", methods=["POST"])
+def registrar_salida_lotes(lote_id):
+    try:
+        # Conectar a la base de datos
+        conn = get_db_connection()
+
+        # Verificar si el lote existe antes de eliminarlo
+        lote_existente = conn.execute("SELECT * FROM Lotes WHERE ID = ?", (lote_id,)).fetchone()
+        if not lote_existente:
+            return jsonify({"success": False, "error": "El lote no existe"}), 404
+
+        # Eliminar el lote correspondiente
+        conn.execute("DELETE FROM Lotes WHERE ID = ?", (lote_id,))
+        conn.commit()
+        conn.close()
+
+        # Devolver una respuesta JSON de éxito
+        return jsonify({"success": True}), 200
+    except Exception as e:
+        # En caso de error, devolver un mensaje JSON de error
+        return jsonify({"success": False, "error": str(e)}), 500
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@app.route("/inventario", methods=["GET"])
+def inventario():
+    # Verifica que el usuario esté autenticado como empleado y que sea almacenista
+    if "user_id" not in session or session.get("user_role") != "Almacenista":
+        flash("Acceso no autorizado. Por favor, inicie sesión como almacenista.", "danger")
+        return redirect(url_for("login"))
+
+    try:
+        # Consulta los datos del inventario en la base de datos
+        conn = get_db_connection()
+        ingredientes = conn.execute(
+            """
+            SELECT 
+                ID, 
+                Fecha_ingreso, 
+                Nombre, 
+                Proveedor, 
+                Numero_lote, 
+                Cantidad, 
+                Unidad
+            FROM Lotes
+            """
+        ).fetchall()
+        conn.close()
+
+        # Convertir los resultados en una lista de diccionarios para facilitar el uso en Jinja
+        ingredientes = [
+            {
+                "ID": row[0],
+                "Fecha_ingreso": row[1],
+                "Nombre": row[2],
+                "Proveedor": row[3],
+                "Numero_lote": row[4],
+                "Cantidad": row[5],
+                "Unidad": row[6],
+            }
+            for row in ingredientes
+        ]
+
+        # Renderiza la página de inventario con los datos obtenidos
+        return render_template("inventario/inventario.html", ingredientes=ingredientes)
+    except Exception as e:
+        # Manejo de errores
+        print(f"Error al obtener el inventario: {e}")
+        flash("Hubo un error al cargar el inventario. Intente más tarde.", "danger")
+        return redirect(url_for("almacenista_dashboard"))
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 @app.route("/dashboard-ventas")
 def dashboard_ventas():
-    return render_template("dashboard_ventas.html")
+    # Verifica que el usuario esté autenticado como empleado y que sea almacenista
+    if "user_id" not in session or session.get("user_role") != "Ventas":
+        flash("Acceso no autorizado. Por favor, inicie sesión como almacenista.", "danger")
+        return redirect(url_for("login"))
 
+    # Aquí puedes incluir lógica adicional para cargar datos como proveedores, etc.
+    conn = get_db_connection()
+    proveedores = conn.execute("SELECT ID, Nombre FROM Proveedores").fetchall()
+    conn.close()
+    return render_template("/inventario/inventario.html")
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 @app.route("/logout")
 def logout():
