@@ -1,0 +1,138 @@
+/* Estilo General */
+body {
+    font-family: 'Sahitya', serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+}
+
+/* Barra de Navegación */
+nav {
+    background-color: #78c0e0;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav a {
+    color: #4c2b19;
+    font-weight: bold;
+    text-decoration: none;
+    margin: 0 10px;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+.logo img {
+    height: 50px;
+}
+
+.user-icon img {
+    height: 40px;
+    border-radius: 50%;
+}
+
+/* Contenedor Principal */
+.main-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+h1 {
+    text-align: center;
+    color: #4c2b19;
+    margin-bottom: 30px;
+}
+
+/* Lista de Pedidos */
+.order-list-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    background-color: #d9a066;
+    color: #4c2b19;
+    padding: 10px 20px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.order-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    align-items: center;
+    background-color: #d9a066;
+    color: #4c2b19;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    padding: 10px 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.order-item p {
+    margin: 0;
+    text-align: center;
+}
+
+.order-item a {
+    text-decoration: none;
+    color: #4c2b19;
+    font-weight: bold;
+    text-align: center;
+}
+
+.order-item a:hover {
+    text-decoration: underline;
+}
+
+/* Modal para los Detalles */
+.details-container {
+    display: none;
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -20%);
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    width: 400px;
+}
+
+.details-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #4c2b19;
+}
+
+.details-container ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+.details-container ul li {
+    margin-bottom: 10px;
+}
+
+.details-container button {
+    display: block;
+    margin: 0 auto;
+    padding: 10px 20px;
+    background-color: #4c2b19;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.details-container button:hover {
+    background-color: #3a2214;
+}

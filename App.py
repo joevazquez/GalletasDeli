@@ -1,7 +1,8 @@
 import sqlite3
 import jsonify
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 import json
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 app.secret_key = "GalletasDeliAdmin1234#$%"
@@ -266,6 +267,182 @@ def actualizar_direccion():
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+@app.route('/pago', methods=['POST'])
+def pago():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("Por favor, inicia sesión.", "danger")
+        return redirect(url_for('login'))
+
+    # Recuperar datos del pedido desde la sesión
+    resumen_pedido = session.get('resumen_pedido', {})
+    total_pedido = session.get('total_pedido', 0)
+
+    if not resumen_pedido or total_pedido == 0:
+        flash("No hay productos en el pedido o el total es inválido.", "warning")
+        return redirect(url_for('catalogo_productos'))
+
+    # Recuperar el historial de pedidos
+    historial_pedidos = session.get('historial_pedidos', [])
+
+    # Generar un ID único para el pedido
+    new_id = str(len(historial_pedidos) + 1) + "-" + datetime.now().strftime('%H%M%S')
+
+    # Crear un nuevo pedido
+    nuevo_pedido = {
+        "id": new_id,
+        "products": resumen_pedido,
+        "total": total_pedido,
+        "creation_date": datetime.now().strftime('%Y-%m-%d'),
+        "delivery_date": (datetime.now() + timedelta(days=15)).strftime('%Y-%m-%d'),
+        "status": "Procesando"
+    }
+
+    # Agregar el nuevo pedido al historial
+    historial_pedidos.append(nuevo_pedido)
+    session['historial_pedidos'] = historial_pedidos
+    session.modified = True
+
+    # Redirigir a la página de rastreo de órdenes
+    flash("Pago realizado con éxito. Tu pedido está en proceso.", "success")
+    return redirect(url_for('rastreo_pedidos'))  # No necesita ajuste si la ruta es /rastreo-pedidos
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@app.route('/procesar_pago', methods=['POST'])
+def procesar_pago():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("Por favor, inicia sesión.", "danger")
+        return redirect(url_for('login'))
+
+    resumen_pedido = session.get('resumen_pedido', {})
+    total_pedido = session.get('total_pedido', 0)
+
+    # Validar que haya un pedido válido
+    if not resumen_pedido or total_pedido == 0:
+        flash("No hay productos en el pedido o el total es inválido.", "warning")
+        return redirect(url_for('catalogo_productos'))
+
+    # Generar un nuevo ID para el pedido
+    historial_pedidos = session.get('historial_pedidos', [])
+    new_id = str(len(historial_pedidos) + 1) + "-" + datetime.now().strftime('%H%M%S')
+
+    # Crear el nuevo pedido
+    nuevo_pedido = {
+        "id": new_id,
+        "products": resumen_pedido,  # Asegurarse de que es un diccionario
+        "total": total_pedido,
+        "creation_date": datetime.now().strftime('%Y-%m-%d'),
+        "delivery_date": (datetime.now() + timedelta(days=15)).strftime('%Y-%m-%d'),
+        "status": "Procesando"
+    }
+
+    # Guardar el pedido en el historial
+    historial_pedidos.append(nuevo_pedido)
+    session['historial_pedidos'] = historial_pedidos
+    session.modified = True
+
+    flash("Pago procesado exitosamente. Tu pedido está en proceso.", "success")
+    return redirect(url_for('rastreo_pedidos'))
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@app.route('/rastreo-pedidos')
+def rastreo_pedidos():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("Por favor, inicia sesión.", "danger")
+        return redirect(url_for('login'))
+
+    # Recuperar el historial de pedidos desde la sesión
+    historial_pedidos = session.get('historial_pedidos', [])
+
+    # Depuración: Imprimir el historial de pedidos en la consola
+    print("Historial de Pedidos en /rastreo-pedidos:", historial_pedidos)
+
+    # Renderizar la página con el historial de pedidos
+    return render_template(
+        'rastreo/rastreo-ordenes.html',  # Cambia aquí el nombre del archivo
+        historial_pedidos=historial_pedidos,
+        user_name=session.get('user_name', 'Usuario')
+    )
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@app.route('/get-order-details/<order_id>', methods=['GET'])
+def get_order_details(order_id):
+    historial_pedidos = session.get('historial_pedidos', [])
+
+    # Debug: muestra el historial de pedidos
+    print("Historial de Pedidos en get-order-details:", historial_pedidos)
+
+    # Buscar el pedido por ID
+    pedido = next((p for p in historial_pedidos if p['id'] == order_id), None)
+
+    if not pedido:
+        return jsonify({"error": "Pedido no encontrado"}), 404
+
+    # Convertir los productos de JSON a un diccionario de Python
+    try:
+        productos = json.loads(pedido['products'])
+    except json.JSONDecodeError:
+        return jsonify({"error": "Formato de productos inválido"}), 500
+
+    # Transformar los datos de productos al formato requerido
+    productos_detalle = []
+    for producto, cantidades in productos.items():
+        productos_detalle.append({
+            "name": producto,
+            "quantity": cantidades.get('half-kilo', 0) + cantidades.get('six-pieces', 0),
+            "price": cantidades.get('half-kilo', 0) * 100 + cantidades.get('six-pieces', 0) * 50
+        })
+
+    return jsonify({
+        "products": productos_detalle,
+        "total": pedido['total']
+    })
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@app.route('/finalizar-pedido', methods=['POST'])
+def finalizar_pedido():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("Por favor, inicia sesión.", "danger")
+        return redirect(url_for('login'))
+
+    # Recuperar datos del pedido desde la sesión
+    resumen_pedido = session.get('resumen_pedido', {})
+    total_pedido = session.get('total_pedido', 0)
+
+    if not resumen_pedido:
+        flash("No hay productos en el pedido.", "warning")
+        return redirect(url_for('catalogo_productos'))
+
+    historial_pedidos = session.get('historial_pedidos', [])
+    new_id = str(len(historial_pedidos) + 1) + "-" + datetime.now().strftime('%H%M%S')
+
+    # Crear un nuevo pedido
+    nuevo_pedido = {
+        "id": new_id,
+        "products": resumen_pedido,
+        "total": total_pedido,
+        "creation_date": datetime.now().strftime('%Y-%m-%d'),
+        "delivery_date": (datetime.now() + timedelta(days=15)).strftime('%Y-%m-%d'),
+        "status": "Procesando"
+    }
+
+    # Agregar el nuevo pedido al historial
+    historial_pedidos.append(nuevo_pedido)
+    session['historial_pedidos'] = historial_pedidos
+    session.modified = True
+
+    flash("Pedido realizado exitosamente.", "success")
+    return redirect(url_for('rastreo_pedidos'))
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 @app.route("/dashboard")
 def dashboard():
     if "user_id" not in session or session.get("user_type") != "empleado":
@@ -274,6 +451,15 @@ def dashboard():
 
     user_role = session.get("user_role")
     return f"Bienvenido al panel de empleados. Rol: {user_role}."
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 @app.route("/dashboard-ventas")
 def dashboard_ventas():

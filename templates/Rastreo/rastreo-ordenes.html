@@ -3,48 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galletas Deli</title>
+    <title>Rastreo de Pedidos</title>
+    <!-- Vincular el CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/rastreo-pedidos.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sahitya:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
-    <!-- Barra de navegación -->        
+    <!-- Barra de Navegación -->
     <nav>
-        <div class="selection-nav">
+        <div>
             <a href="{{ url_for('catalogo_productos') }}">Ordenar</a>
-            <a href=""><u>Rastrear</u></a>
-        </div>        
-        <div class="logo">
-            <img src="{{ url_for('static', filename='images/logo_ventas.png') }}" alt="Logo">            
+            <a href="{{ url_for('rastreo_pedidos') }}"><u>Rastrear</u></a>
         </div>
-        <div class="user-icon">
-            <img src="{{ url_for('static', filename='images/user-icon.png') }}" alt="Usuario">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/logo_ventas.png') }}" alt="Galletas Deli">
+        </div>
+        <div class="user-greeting">
+            Hola, {{ user_name }}
         </div>
     </nav>
-            
-    <!-- Contenido principal -->
+
+    <!-- Contenedor Principal -->
     <div class="main-container">
-        <!-- Lista de productos -->         
-        <div class="order-list">
-            <div class="order-list-header">
-                <p>Order</p>
-                <p>Creation date</p>
-                <p>Delivery date</p>
-                <p>Status</p>
-                <p></p>                
-            </div>
-            {% for order in orders %}
-            <div class="order-item">                
-                <p>{{ order['id'] }}</p>
-                <p>{{ order['creation_date'] }}</p>
-                <p>{{ order['delivery_date'] }}</p>
-                <p>{{ order['status'] }}</p>
-                <a href="{{ (order['details']) }}">Details</a>
-            </div>
-            {% endfor %}
-        </div>        
+        <h1>Rastreo de Pedidos</h1>
+
+        <!-- Encabezado de la Lista de Pedidos -->
+        <div class="order-list-header">
+            <p>Order</p>
+            <p>Creation date</p>
+            <p>Deliver date</p>
+            <p>Status</p>
+            <p></p>
+        </div>
+
+        <!-- Iterar sobre los pedidos -->
+        {% for order in historial_pedidos %}
+        <div class="order-item">
+            <p>#{{ order['id'] }}</p>
+            <p>{{ order['creation_date'] }}</p>
+            <p>{{ order['delivery_date'] }}</p>
+            <p>{{ order['status'] }}</p>
+            <a href="#" class="details-btn" data-order-id="{{ order['id'] }}">Details</a>
+        </div>
+        
+        {% endfor %}
     </div>
+
+    <!-- Modal para Mostrar Detalles del Pedido -->
+    <div id="order-details" class="details-container">
+        <h2>Detalles del Pedido</h2>
+        <p id="order-id"></p>
+        <ul id="order-products">
+            <!-- Productos del pedido se cargarán dinámicamente aquí -->
+        </ul>
+        <p id="order-total"><strong>Total:</strong> $0</p>
+        <button onclick="closeDetails()">Cerrar</button>
+    </div>    
 </body>
+
+<script>
+    document.querySelectorAll('.details-btn').forEach(btn => {
+    btn.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        const orderId = this.dataset.orderId;
+
+        // Realizar una solicitud al servidor para obtener los detalles
+        fetch(`/get-order-details/${orderId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Pedido no encontrado');
+                }
+                return response.json();
+            })
+            .then(details => {
+                // Mostrar información en el contenedor
+                const orderIdElement = document.getElementById('order-id');
+                const productsList = document.getElementById('order-products');
+                const orderTotalElement = document.getElementById('order-total');
+
+                if (orderIdElement && productsList && orderTotalElement) {
+                    orderIdElement.textContent = `Pedido ID: #${orderId}`;
+                    productsList.innerHTML = ''; // Limpiar lista de productos
+
+                    // Agregar productos al modal
+                    details.products.forEach(product => {
+                        const li = document.createElement('li');
+                        li.textContent = `${product.quantity}x ${product.name} - $${product.price}`;
+                        productsList.appendChild(li);
+                    });
+
+                    orderTotalElement.innerHTML = `<strong>Total:</strong> $${details.total}`;
+                    document.getElementById('order-details').style.display = 'block';
+                } else {
+                    alert('Error al mostrar los detalles del pedido.');
+                }
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+    });
+});
+
+
+    // Cerrar detalles
+    function closeDetails() {
+        document.getElementById('order-details').style.display = 'none';
+    }
+</script>
 </html>

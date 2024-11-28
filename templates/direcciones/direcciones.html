@@ -140,7 +140,7 @@
           
 
             <h2>Datos de pago</h2>
-            <form id="form-pago">
+            <form id="form-pago" action="{{ url_for('procesar_pago') }}" method="POST">
                 <div class="form-group">
                     <label for="numero_tarjeta">Número de tarjeta</label>
                     <input 
@@ -148,7 +148,7 @@
                         id="numero_tarjeta" 
                         name="numero_tarjeta" 
                         placeholder="Número de tarjeta" 
-                        maxlength="19"
+                        maxlength="16"
                         pattern="\d{16}" 
                         title="Ingrese 16 dígitos para el número de tarjeta" 
                         required>
@@ -177,7 +177,7 @@
                         required>
                 </div>
                 <button type="submit" class="btn-order">Pagar</button>
-            </form>            
+            </form>                        
     </div>
 
     <!-- Mensajes dinámicos -->
