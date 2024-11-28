@@ -123,14 +123,14 @@ def register_empleado():
 def authenticate():
     username = request.form.get("username")
     contrasena = request.form.get("password")
-    es_empleado = request.form.get("es_empleado")  # Valor enviado como 'on' o None
+    es_empleado = request.form.get("es_empleado")
 
     print("Datos recibidos:")
     print(f"Usuario: {username}, Contraseña: {contrasena}, Es empleado: {es_empleado}")
 
     conn = get_db_connection()
 
-    if es_empleado:  # Si el checkbox está marcado, verificar en la tabla de empleados
+    if es_empleado == 'on':  # Si el checkbox está marcado, verificar en la tabla de empleados
         print("Consultando en tabla Empleado...")
         user = conn.execute(
             """
@@ -146,7 +146,6 @@ def authenticate():
             # Usuario autenticado como empleado
             session["user_type"] = "empleado"
             session["user_id"] = user["id"]
-            session["direccion"] = user["direccion"]
             session["user_role"] = user["role"]
             session["user_name"] = user["name"]
             conn.close()
@@ -160,11 +159,14 @@ def authenticate():
                 return redirect(url_for("produccion_dashboard"))
             elif user["role"].lower() == "qa":
                 return redirect(url_for("qa_dashboard"))
+            elif user["role"].lower() == "ventas":
+                return redirect(url_for("dashboard_ventas"))
             else:
                 flash("Rol no reconocido.", "warning")
                 return redirect(url_for("login"))
         else:
             print("Empleado no encontrado.")
+            print("Error login empleado")
             flash("Usuario o contraseña incorrectos.", "danger")
             conn.close()
             return redirect(url_for("login"))
@@ -193,7 +195,6 @@ def authenticate():
             flash("Usuario o contraseña incorrectos.", "danger")
             conn.close()
             return redirect(url_for("login"))
-
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -753,8 +754,23 @@ def dashboard_ventas():
     conn = get_db_connection()
     proveedores = conn.execute("SELECT ID, Nombre FROM Proveedores").fetchall()
     conn.close()
-    return render_template("/inventario/inventario.html")
+    return render_template("/Dashboard_ventas/dashboard_ventas.html")
 
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+"""
+@app.route("/ventas_inventario")
+def dashboard_ventas():
+    # Verifica que el usuario esté autenticado como empleado y que sea almacenista
+    if "user_id" not in session or session.get("user_role") != "Ventas":
+        flash("Acceso no autorizado. Por favor, inicie sesión como almacenista.", "danger")
+        return redirect(url_for("login"))
+
+    # Aquí puedes incluir lógica adicional para cargar datos como proveedores, etc.
+    conn = get_db_connection()
+    proveedores = conn.execute("SELECT ID, Nombre FROM Proveedores").fetchall()
+    conn.close()
+    return render_template("/inventario/inventario_ventas.html")
+"""
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 @app.route("/logout")
