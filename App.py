@@ -1,6 +1,7 @@
 import sqlite3
 import jsonify
 from flask import Flask, render_template, request, redirect, url_for, flash, session
+import json
 
 app = Flask(__name__)
 app.secret_key = "GalletasDeliAdmin1234#$%"
@@ -186,19 +187,29 @@ def authenticate():
         flash("Error al determinar el tipo de usuario.", "danger")
         return redirect(url_for("login"))
 
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 @app.route('/catalogo_productos', methods=['GET', 'POST'])
 def catalogo_productos():
     if request.method == 'POST':
-        resumen_pedido = request.form.get('resumenPedido')
-        total_pedido = request.form.get('totalPedido')
+        # Recibe los datos del formulario
+        resumen_pedido = request.form.get('resumenPedido', 'Sin resumen disponible')
+        total_pedido = request.form.get('totalPedido', 0)
         
         # Guarda los datos en la sesión
         session['resumen_pedido'] = resumen_pedido
         session['total_pedido'] = total_pedido
         
+        # Redirige a la página de direcciones
         return redirect(url_for('direcciones'))
-    return render_template('Catalogo/catalogo-productos.html', user_name=session.get('user_name'))
-
+    
+    # Carga el catálogo de productos
+    return render_template(
+        'Catalogo/catalogo-productos.html',
+        user_pedido=session.get('resumen_pedido', 'Sin resumen disponible'),
+        total_pedido=session.get('total_pedido', 0),
+        user_name=session.get('user_name', 'Usuario')
+    )
 
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -210,46 +221,28 @@ def direcciones():
         flash("Por favor, inicia sesión.", "danger")
         return redirect(url_for('login'))
 
-    conn = get_db_connection()
+    resumen_pedido = session.get('resumen_pedido', '{}')  # JSON vacío como valor predeterminado
+    try:
+        resumen_pedido = json.loads(resumen_pedido)  # Convertir el string JSON a un dict de Python
+    except json.JSONDecodeError:
+        resumen_pedido = {}
 
-    # Cargar la dirección actual desde la base de datos
+    total_pedido = session.get('total_pedido', 0)
+
+    conn = get_db_connection()
     direccion = conn.execute(
         "SELECT Direccion FROM Clientes WHERE ID_cliente = ?",
         (user_id,)
     ).fetchone()
-
     direccion = direccion["Direccion"] if direccion and direccion["Direccion"] else None
-
-    # Manejar actualización de dirección
-    if request.method == 'POST':
-        estado = request.form['estado']
-        ciudad = request.form['ciudad']
-        delegacion = request.form['delegacion']
-        colonia = request.form['colonia']
-        calle_numero = request.form['calle_numero']
-
-        # Concatenar la dirección completa
-        direccion_completa = f"{estado}, {ciudad}, {delegacion}, {colonia}, {calle_numero}"
-
-        # Actualizar la dirección en la base de datos
-        conn.execute(
-            "UPDATE Clientes SET Direccion = ? WHERE ID_cliente = ?",
-            (direccion_completa, user_id)
-        )
-        conn.commit()
-
-        flash("Dirección actualizada con éxito.", "success")
-        return redirect(url_for('direcciones'))
-
     conn.close()
 
-    # Renderizar el HTML con la dirección actual
     return render_template(
         'direcciones/direcciones.html',
         direccion=direccion,
-        user_name=session.get('user_name', 'Usuario'),
-        resumen_pedido=session.get('resumen_pedido', ''),
-        total_pedido=session.get('total_pedido', 0)
+        resumen_pedido=resumen_pedido,
+        total_pedido=total_pedido,
+        user_name=session.get('user_name', 'Usuario')
     )
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------

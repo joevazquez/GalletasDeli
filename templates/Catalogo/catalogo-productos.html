@@ -59,8 +59,8 @@
 
 
             <div class="product-card">
-                <img src="/static/images/galletas-coco.jpg" alt="Naranja">
-                <p>Naranja</p>
+                <img src="/static/images/galletas-coco.jpg" alt="Coco">
+                <p>Coco</p>
                 <div class="counter">
                     <button class="decrement" onclick="updateCounter('coco', 'half-kilo', -1)">−</button>
                     <span id="coco-half-kilo-counter">0</span>
@@ -74,8 +74,8 @@
             </div>
 
             <div class="product-card">
-                <img src="/static/images/galletas-chocolate.jpg" alt="Naranja">
-                <p>Naranja</p>
+                <img src="/static/images/galletas-chocolate.jpg" alt="Chocolate">
+                <p>Chocolate</p>
                 <div class="counter">
                     <button class="decrement" onclick="updateCounter('chocolate', 'half-kilo', -1)">−</button>
                     <span id="chocolate-half-kilo-counter">0</span>
@@ -89,8 +89,8 @@
             </div>
 
             <div class="product-card">
-                <img src="/static/images/galletas-avena.jpg" alt="Naranja">
-                <p>Naranja</p>
+                <img src="/static/images/galletas-avena.jpg" alt="Avena">
+                <p>Avena</p>
                 <div class="counter">
                     <button class="decrement" onclick="updateCounter('avena', 'half-kilo', -1)">−</button>
                     <span id="avena-half-kilo-counter">0</span>
@@ -104,8 +104,8 @@
             </div>
 
             <div class="product-card">
-                <img src="/static/images/galletas-surtidas.jpg" alt="Naranja">
-                <p>Naranja</p>
+                <img src="/static/images/galletas-surtidas.jpg" alt="Surtidas">
+                <p>Surtidas</p>
                 <div class="counter">
                     <button class="decrement" onclick="updateCounter('surtidas', 'half-kilo', -1)">−</button>
                     <span id="surtidas-half-kilo-counter">0</span>
@@ -132,8 +132,8 @@
             </div>
             <p class="total" id="order-total">Total: $0.00</p>
 
-            <!-- Redirigir a la página de direcciones -->
-            <form action="{{ url_for('direcciones') }}" method="GET">
+            <!-- Formulario para enviar el pedido -->
+            <form action="{{ url_for('catalogo_productos') }}" method="POST">
                 <input type="hidden" name="resumenPedido" id="resumenPedido">
                 <input type="hidden" name="totalPedido" id="totalPedido">
                 <button type="submit" class="btn-order">Ordenar</button>
@@ -141,6 +141,7 @@
         </div>
     </div>
 
+    <!-- Scripts -->
     <script>
         const prices = { "half-kilo": 100, "six-pieces": 50 }; // Precios por tipo de producto
         const orderSummary = {}; // Resumen del pedido
@@ -185,7 +186,7 @@
             }
 
             orderTotal.textContent = `Total: $${total.toFixed(2)}`;
-            document.getElementById("resumenPedido").value = orderDetails.innerHTML;
+            document.getElementById("resumenPedido").value = JSON.stringify(orderSummary); // Guardar como JSON
             document.getElementById("totalPedido").value = total.toFixed(2);
         }
 

@@ -87,14 +87,24 @@
 
     <!-- Contenedor principal -->
     <div class="container">
-        <!-- Resumen del pedido -->
-        <div class="summary-box">
-            <h2>Resumen del pedido</h2>
-            <div id="order-details">
-                {{ resumen_pedido|safe }}
-            </div>
+        <div class="order-summary">
+            <h2>Resumen del Pedido</h2>
+            <ul>
+                {% for producto, cantidades in resumen_pedido.items() %}
+                    <li><strong>{{ producto|capitalize }}</strong>:</li>
+                    <ul>
+                        {% if cantidades['half-kilo'] > 0 %}
+                            <li>Cajas de medio kilo: {{ cantidades['half-kilo'] }}</li>
+                        {% endif %}
+                        {% if cantidades['six-pieces'] > 0 %}
+                            <li>Cajas de 6 piezas: {{ cantidades['six-pieces'] }}</li>
+                        {% endif %}
+                    </ul>
+                {% endfor %}
+            </ul>
             <p><strong>Total:</strong> ${{ total_pedido }}</p>
-        </div>
+        </div>        
+        
 
         <!-- Formulario para la dirección y pago -->
         <div class="form-section">
@@ -133,19 +143,41 @@
             <form id="form-pago">
                 <div class="form-group">
                     <label for="numero_tarjeta">Número de tarjeta</label>
-                    <input type="text" id="numero_tarjeta" name="numero_tarjeta" placeholder="Número de tarjeta" required>
+                    <input 
+                        type="text" 
+                        id="numero_tarjeta" 
+                        name="numero_tarjeta" 
+                        placeholder="Número de tarjeta" 
+                        maxlength="19"
+                        pattern="\d{16}" 
+                        title="Ingrese 16 dígitos para el número de tarjeta" 
+                        required>
                 </div>
                 <div class="form-group">
                     <label for="fecha_expiracion">Fecha de expiración</label>
-                    <input type="text" id="fecha_expiracion" name="fecha_expiracion" placeholder="MM/AA" required>
+                    <input 
+                        type="text" 
+                        id="fecha_expiracion" 
+                        name="fecha_expiracion" 
+                        placeholder="MM/DD" 
+                        pattern="^(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])$" 
+                        title="Ingrese la fecha en formato MM/DD (mes/día)." 
+                        required>
                 </div>
                 <div class="form-group">
                     <label for="cvv">CVV</label>
-                    <input type="text" id="cvv" name="cvv" placeholder="CVV" required>
+                    <input 
+                        type="password" 
+                        id="cvv" 
+                        name="cvv" 
+                        placeholder="CVV" 
+                        maxlength="3" 
+                        pattern="\d{3}" 
+                        title="Ingrese 3 dígitos para el CVV" 
+                        required>
                 </div>
                 <button type="submit" class="btn-order">Pagar</button>
-            </form>
-        </div>
+            </form>            
     </div>
 
     <!-- Mensajes dinámicos -->
@@ -181,5 +213,20 @@
         }
     })
     .catch(err => console.error('Error:', err));
+
+    // Validación en tiempo real para el campo de fecha de expiración
+    document.getElementById('fecha_expiracion').addEventListener('input', function (e) {
+        const input = e.target;
+        const value = input.value;
+
+        // Validar formato MM/DD
+        const isValid = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])$/.test(value);
+
+        if (!isValid && value.length > 0) {
+            input.setCustomValidity("Por favor, ingrese una fecha válida en formato MM/DD.");
+        } else {
+            input.setCustomValidity("");
+        }
+    });
 });
 </script>
