@@ -3,230 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dirección y Pago - Galletas Deli</title>
-    <link rel="stylesheet" href="/static/css/catalogo-productos.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            display: flex;
-            justify-content: space-between;
-            padding: 20px;
-            gap: 20px;
-        }
-        .summary-box {
-            background-color: #f4d9a8;
-            border-radius: 10px;
-            padding: 20px;
-            width: 30%;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .form-section {
-            width: 65%;
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #a5d8ff;
-            border-radius: 5px;
-        }
-        .btn-order {
-            background-color: #4c2b19;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            display: block;
-            margin: 20px auto;
-            transition: background-color 0.3s ease;
-        }
-        .btn-order:hover {
-            background-color: #3a2214;
-        }
-        h2 {
-            color: #4c2b19;
-            margin-bottom: 15px;
-        }
-        .order-details p, .summary-box p {
-            margin: 10px 0;
-        }
-    </style>
+    <title>Direcciones - Ventas</title>
+    <link rel="stylesheet" href="/static/css/direcciones_ventas.css">
 </head>
 <body>
     <!-- Barra de navegación -->
     <nav class="navbar">
         <div class="nav-links">
-            <a href="{{ url_for('catalogo_productos') }}" class="">Ordenar</a>
-            <a href="#">Rastrear</a>
+            <a href="{{ url_for('catalogo_productos_ventas') }}">Ordenar</a>
+            <a href="{{ url_for('dashboard_ventas') }}">Dashboard Ventas</a>
+            <a href="{{ url_for('ventas_inventario') }}">Inventario ventas</a>
         </div>
         <div class="logo">
             <img src="/static/images/logo_ventas.png" alt="Galletas Deli">
         </div>
         <div class="user-greeting">
-            Hola, {{ user_name }}
+            Hola, {{ session.get('user_name', 'Usuario') }}
         </div>
     </nav>
 
+    <!-- Mensaje de éxito -->
+    {% if direccion_guardada %}
+    <div class="alert alert-success">
+        Dirección guardada correctamente: <strong>{{ session.get('direccion_completa', '') }}</strong>
+    </div>
+    {% endif %}
+
     <!-- Contenedor principal -->
-    <div class="container">
+    <div class="main-container">
+        <h1>Registrar Dirección para {{ session.get('cliente_grande_nombre', 'Cliente no seleccionado') }}</h1>
+
+        <!-- Mostrar dirección guardada previamente -->
+        {% if session.get('direccion_completa') %}
+        <p><strong>Dirección actual:</strong> {{ session.get('direccion_completa') }}</p>
+        {% else %}
+        <p><strong>Dirección actual:</strong> No registrada.</p>
+        {% endif %}
+
+        <!-- Formulario para agregar una nueva dirección -->
+        <form id="direccionForm" class="address-form">
+            <div class="form-group">
+                <label for="calle">Calle y Número:</label>
+                <input type="text" id="calle" name="calle" placeholder="Calle y Número" required>
+            </div>
+            <div class="form-group">
+                <label for="delegacion">Delegación:</label>
+                <input type="text" id="delegacion" name="delegacion" placeholder="Delegación" required>
+            </div>
+            <div class="form-group">
+                <label for="colonia">Colonia:</label>
+                <input type="text" id="colonia" name="colonia" placeholder="Colonia" required>
+            </div>
+            <div class="form-group">
+                <label for="ciudad">Ciudad:</label>
+                <input type="text" id="ciudad" name="ciudad" placeholder="Ciudad" required>
+            </div>
+            <div class="form-group">
+                <label for="estado">Estado:</label>
+                <input type="text" id="estado" name="estado" placeholder="Estado" required>
+            </div>
+            <div class="form-group">
+                <label for="cp">CP:</label>
+                <input type="tel" id="cp" name="cp" placeholder="CP" required>
+            </div>
+            <button type="button" id="guardarDireccion" class="btn btn-save">Guardar Dirección</button>
+        </form>
+
+        <!-- Resumen del Pedido -->
         <div class="order-summary">
             <h2>Resumen del Pedido</h2>
-            <ul>
-                {% for producto, cantidades in resumen_pedido.items() %}
-                    <li><strong>{{ producto|capitalize }}</strong>:</li>
-                    <ul>
+            <div id="order-details">
+                {% if resumen_pedido and resumen_pedido.items() %}
+                    {% for producto, cantidades in resumen_pedido.items() %}
+                        <p><strong>{{ producto.capitalize() }}</strong></p>
                         {% if cantidades['half-kilo'] > 0 %}
-                            <li>Cajas de medio kilo: {{ cantidades['half-kilo'] }}</li>
+                            <p>Medio Kilo: {{ cantidades['half-kilo'] }}</p>
                         {% endif %}
                         {% if cantidades['six-pieces'] > 0 %}
-                            <li>Cajas de 6 piezas: {{ cantidades['six-pieces'] }}</li>
+                            <p>6 Piezas: {{ cantidades['six-pieces'] }}</p>
                         {% endif %}
-                    </ul>
-                {% endfor %}
-            </ul>
+                    {% endfor %}
+                {% else %}
+                    <p>No hay productos seleccionados.</p>
+                {% endif %}
+            </div>
             <p><strong>Total:</strong> ${{ total_pedido }}</p>
-        </div>        
-        
+        </div>
 
-        <!-- Formulario para la dirección y pago -->
-        <div class="form-section">
-            <h2>Dirección de envío</h2>
-            {% if direccion %}
-            <p><strong>Dirección actual:</strong> {{ direccion }}</p>
-            {% else %}
-            <p><strong>Dirección actual:</strong> No registrada.</p>
-            {% endif %}
-              <form id="form-actualizar-direccion">
-                <div class="form-group">
-                    <label for="estado">Estado</label>
-                    <input type="text" id="estado" name="estado" placeholder="Estado" required>
-                </div>
-                <div class="form-group">
-                    <label for="ciudad">Ciudad</label>
-                    <input type="text" id="ciudad" name="ciudad" placeholder="Ciudad" required>
-                </div>
-                <div class="form-group">
-                    <label for="delegacion">Delegación</label>
-                    <input type="text" id="delegacion" name="delegacion" placeholder="Delegación" required>
-                </div>
-                <div class="form-group">
-                    <label for="colonia">Colonia</label>
-                    <input type="text" id="colonia" name="colonia" placeholder="Colonia" required>
-                </div>
-                <div class="form-group">
-                    <label for="calle_numero">Calle y Número</label>
-                    <input type="text" id="calle_numero" name="calle_numero" placeholder="Calle y Número" required>
-                </div>
-                <button type="submit" class="btn-order">Actualizar Dirección</button>
+        <!-- Botón para ordenar -->
+        <div class="button-container">
+            <form action="{{ url_for('generar_pedido') }}" method="GET">
+                <button type="submit" class="btn btn-save">Ordenar</button>
             </form>
-          
-
-            <h2>Datos de pago</h2>
-            <form id="form-pago" action="{{ url_for('procesar_pago') }}" method="POST">
-                <div class="form-group">
-                    <label for="numero_tarjeta">Número de tarjeta</label>
-                    <input 
-                        type="text" 
-                        id="numero_tarjeta" 
-                        name="numero_tarjeta" 
-                        placeholder="Número de tarjeta" 
-                        maxlength="16"
-                        pattern="\d{16}" 
-                        title="Ingrese 16 dígitos para el número de tarjeta" 
-                        required>
-                </div>
-                <div class="form-group">
-                    <label for="fecha_expiracion">Fecha de expiración</label>
-                    <input 
-                        type="text" 
-                        id="fecha_expiracion" 
-                        name="fecha_expiracion" 
-                        placeholder="MM/DD" 
-                        pattern="^(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])$" 
-                        title="Ingrese la fecha en formato MM/DD (mes/día)." 
-                        required>
-                </div>
-                <div class="form-group">
-                    <label for="cvv">CVV</label>
-                    <input 
-                        type="password" 
-                        id="cvv" 
-                        name="cvv" 
-                        placeholder="CVV" 
-                        maxlength="3" 
-                        pattern="\d{3}" 
-                        title="Ingrese 3 dígitos para el CVV" 
-                        required>
-                </div>
-                <button type="submit" class="btn-order">Pagar</button>
-            </form>                        
+        </div>        
     </div>
 
-    <!-- Mensajes dinámicos -->
-    <div id="notificacion"></div>
+    <!-- Scripts -->
+    <script>
+        document.getElementById('guardarDireccion').addEventListener('click', async function () {
+            const data = {
+                calle: document.getElementById('calle').value,
+                delegacion: document.getElementById('delegacion').value,
+                colonia: document.getElementById('colonia').value,
+                ciudad: document.getElementById('ciudad').value,
+                estado: document.getElementById('estado').value,
+                cp: document.getElementById('cp').value,
+            };
+    
+            try {
+                const response = await fetch('{{ url_for("guardar_direccion_ventas") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+    
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message);
+                    location.reload(); // Recarga la página para reflejar la nueva dirección
+                } else {
+                    alert(`Error: ${result.message}`);
+                }
+            } catch (error) {
+                alert('Error al guardar la dirección. Inténtalo nuevamente.');
+                console.error(error);
+            }
+        });
+    </script>
 </body>
 </html>
-
-<script>
-  document.getElementById('form-actualizar-direccion').addEventListener('submit', function (e) {
-    e.preventDefault();
-    
-    const data = {
-        estado: document.getElementById('estado').value,
-        ciudad: document.getElementById('ciudad').value,
-        delegacion: document.getElementById('delegacion').value,
-        colonia: document.getElementById('colonia').value,
-        calle_numero: document.getElementById('calle_numero').value,
-    };
-
-    fetch('/actualizar_direccion', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Dirección actualizada exitosamente');
-        } else {
-            alert('Error al actualizar la dirección');
-        }
-    })
-    .catch(err => console.error('Error:', err));
-
-    // Validación en tiempo real para el campo de fecha de expiración
-    document.getElementById('fecha_expiracion').addEventListener('input', function (e) {
-        const input = e.target;
-        const value = input.value;
-
-        // Validar formato MM/DD
-        const isValid = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])$/.test(value);
-
-        if (!isValid && value.length > 0) {
-            input.setCustomValidity("Por favor, ingrese una fecha válida en formato MM/DD.");
-        } else {
-            input.setCustomValidity("");
-        }
-    });
-});
-</script>

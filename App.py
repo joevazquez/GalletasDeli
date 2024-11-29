@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 import pandas as pd
 import io
 import xlsxwriter
+import random
+import string
 
 app = Flask(__name__)
 app.secret_key = "GalletasDeliAdmin1234#$%"
@@ -823,39 +825,234 @@ def generar_reporte_inventario():
 
 @app.route('/catalogo_productos_ventas', methods=['GET', 'POST'])
 def catalogo_productos_ventas():
-    if request.method == 'POST':
-        # Recibe los datos del formulario
-        resumen_pedido = request.form.get('resumenPedido', 'Sin resumen disponible')
-        total_pedido = request.form.get('totalPedido', 0)
-        
-        # Guarda los datos en la sesión
-        session['resumen_pedido_ventas'] = resumen_pedido
-        session['total_pedido_ventas'] = total_pedido
-        
-        # Redirige a una página específica para ventas (por ejemplo, generación de reportes)
-        return redirect(url_for('dashboard_ventas'))
-    
-    # Carga el catálogo de productos para ventas
+    resumen_pedido = session.get('resumen_pedido', {})
+    total_pedido = session.get('total_pedido', 0)
+
     return render_template(
         'Catalogo/catalogo-productos-ventas.html',
-        user_pedido=session.get('resumen_pedido_ventas', 'Sin resumen disponible'),
-        total_pedido=session.get('total_pedido_ventas', 0),
-        user_name=session.get('user_name', 'Usuario')
+        user_name=session.get('user_name', 'Usuario'),
+        resumen_pedido=resumen_pedido,
+        total_pedido=total_pedido
     )
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-@app.route('/catalogo_clientes_grandes', methods=['GET'])
-def catalogo_clientes_grandes():
-    # Simulación de datos de clientes grandes
-    clientes_grandes = [
-        {"nombre": "Distribuidora ABC", "contacto": "Carlos López", "telefono": "555-1234", "email": "contacto@abc.com"},
-        {"nombre": "Mayorista XYZ", "contacto": "Ana Pérez", "telefono": "555-5678", "email": "ventas@xyz.com"},
-        {"nombre": "Tiendas Elite", "contacto": "Juan García", "telefono": "555-9876", "email": "elite@tiendas.com"},
-    ]
-    
-    # Renderiza el HTML de clientes grandes
-    return render_template('Catalogo/catalogo_clientes_grandes.html', clientes_grandes=clientes_grandes)
+@app.route('/guardar_pedido_ventas', methods=['POST'])
+def guardar_pedido_ventas():
+    # Obtiene los datos del formulario
+    cliente_grande = request.form.get('cliente')
+    resumen_pedido = request.form.get('resumenPedido')
+    total_pedido = request.form.get('totalPedido')
+
+    # Guarda los datos en la sesión
+    session['cliente_grande_nombre'] = cliente_grande
+    session['resumen_pedido'] = resumen_pedido
+    session['total_pedido'] = total_pedido
+
+    # Redirige a la página de direcciones ventas
+    return redirect(url_for('direcciones_ventas'))
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@app.route('/direcciones_ventas', methods=['GET', 'POST'])
+def direcciones_ventas():
+    resumen_pedido = session.get('resumen_pedido', '{}')
+    if isinstance(resumen_pedido, str):
+        resumen_pedido = json.loads(resumen_pedido)
+    total_pedido = session.get('total_pedido', 0)
+    cliente_grande = session.get('cliente_grande_nombre', 'Cliente no seleccionado')
+
+    return render_template(
+        'direcciones/direcciones_ventas.html',
+        resumen_pedido=resumen_pedido,
+        total_pedido=total_pedido,
+        cliente_grande=cliente_grande
+    )
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@app.route('/guardar_direccion_ventas', methods=['POST'])
+def guardar_direccion_ventas():
+    try:
+        # Verificar si el Content-Type es JSON
+        if request.content_type == 'application/json':
+            data = request.json
+        else:
+            data = request.form
+
+        cliente_grande = session.get('cliente_grande_nombre')
+        calle = data.get('calle')
+        delegacion = data.get('delegacion')
+        colonia = data.get('colonia')
+        ciudad = data.get('ciudad')
+        estado = data.get('estado')
+        cp = data.get('cp')
+
+        # Validar datos
+        if not cliente_grande:
+            return jsonify({'success': False, 'message': 'No se ha seleccionado un cliente grande.'}), 400
+        if not all([calle, delegacion, colonia, ciudad, estado, cp]):
+            return jsonify({'success': False, 'message': 'Todos los campos son obligatorios.'}), 400
+
+        direccion_completa = f"{calle}, {delegacion}, {colonia}, {ciudad}, {estado}, {cp}"
+
+        # Guardar en la base de datos
+        conn = get_db_connection()
+        try:
+            conn.execute(
+                """
+                UPDATE Clientes
+                SET Direccion = ?
+                WHERE Nombre = ?
+                """,
+                (direccion_completa, cliente_grande)
+            )
+            conn.commit()
+        except Exception as e:
+            return jsonify({'success': False, 'message': f'Error al guardar la dirección: {str(e)}'}), 500
+        finally:
+            conn.close()
+
+        # Actualizar sesión con la nueva dirección
+        session['direccion_completa'] = direccion_completa
+
+        return jsonify({'success': True, 'message': f'Dirección guardada correctamente: {direccion_completa}'}), 200
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error interno del servidor: {str(e)}'}), 500
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Simular días hábiles (lunes a viernes)
+def calcular_fecha_envio(fecha_inicial, dias_habiles):
+    dias_agregados = 0
+    while dias_habiles > 0:
+        fecha_inicial += timedelta(days=1)
+        # Saltar fines de semana
+        if fecha_inicial.weekday() < 5:  # 0: lunes, ..., 4: viernes
+            dias_habiles -= 1
+    return fecha_inicial
+
+# Generar un ID único
+def generar_id_unico():
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@app.route('/generar-pedido')
+def generar_pedido():
+    import json
+    from datetime import datetime, timedelta
+    import random
+    import string
+
+    def calcular_fecha_envio(fecha_inicial, dias_habiles):
+        dias_agregados = 0
+        while dias_habiles > 0:
+            fecha_inicial += timedelta(days=1)
+            if fecha_inicial.weekday() < 5:  # 0: lunes, ..., 4: viernes
+                dias_habiles -= 1
+        return fecha_inicial
+
+    def generar_id_unico():
+        return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+
+    resumen_pedido = session.get('resumen_pedido', '{}')
+    if isinstance(resumen_pedido, str):
+        resumen_pedido = json.loads(resumen_pedido)
+
+    if not isinstance(resumen_pedido, dict):
+        resumen_pedido = {}
+
+    cliente = session.get('cliente_grande_nombre', 'Cliente Desconocido')
+
+    if not resumen_pedido:
+        flash("No hay productos en el resumen de compra.", "danger")
+        return redirect(url_for('catalogo_productos_ventas'))
+
+    fecha_creacion = datetime.now()
+    fecha_envio = calcular_fecha_envio(fecha_creacion, 15)
+    id_unico = generar_id_unico()
+
+    pedido = {
+        'id': id_unico,
+        'cliente': cliente,
+        'creation_date': fecha_creacion.strftime('%d/%m/%Y'),
+        'delivery_date': fecha_envio.strftime('%d/%m/%Y'),
+        'status': 'Preparando',
+        'details': [
+            {
+                'name': producto,
+                'quantity': cantidades.get('half-kilo', 0) + cantidades.get('six-pieces', 0),
+                'price': 50 if 'six-pieces' in cantidades else 100
+            }
+            for producto, cantidades in resumen_pedido.items()
+        ]
+    }
+
+    historial_pedidos_ventas = session.get('historial_pedidos_ventas', [])
+    historial_pedidos_ventas.append(pedido)
+    session['historial_pedidos_ventas'] = historial_pedidos_ventas
+
+    print("Pedido generado:", pedido)
+
+    return render_template(
+        'rastreo/rastreo-ordenes-ventas.html',
+        historial_pedidos_ventas=historial_pedidos_ventas,
+        user_name=session.get('user_name', 'Usuario')
+    )
+
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@app.route('/rastreo-ordenes-ventas')
+def rastreo_ordenes_ventas():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("Por favor, inicia sesión.", "danger")
+        return redirect(url_for('login'))
+
+    # Recuperar datos correctamente
+    historial_pedidos_ventas = session.get('historial_pedidos_ventas', [])
+
+    # Validar si es una lista de diccionarios
+    if not isinstance(historial_pedidos_ventas, list):
+        historial_pedidos_ventas = json.loads(historial_pedidos_ventas)  # Si viene como JSON string
+
+    return render_template(
+        'rastreo/rastreo-ordenes-ventas.html',
+        historial_pedidos_ventas=historial_pedidos_ventas,
+        user_name=session.get('user_name', 'Usuario')
+    )
+
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@app.route('/get-order-details-ventas/<order_id>', methods=['GET'])
+def get_order_details_ventas(order_id):
+    # Recuperar el historial de pedidos de la sesión
+    historial_pedidos_ventas = session.get('historial_pedidos_ventas', [])
+
+    # Buscar el pedido por ID
+    pedido = next((order for order in historial_pedidos_ventas if order['id'] == order_id), None)
+
+    if pedido:
+        # Calcular el total del pedido
+        total = sum(item['quantity'] * item.get('price', 0) for item in pedido['details'])
+
+        # Preparar los datos para el JSON de respuesta
+        detalles = {
+            'id': pedido['id'],
+            'client_name': pedido['cliente'],
+            'creation_date': pedido['creation_date'],
+            'delivery_date': pedido['delivery_date'],
+            'status': pedido['status'],
+            'products': pedido['details'],  # Lista de productos con cantidad y nombre
+            'total': total
+        }
+        return jsonify({'success': True, 'details': detalles}), 200
+
+    return jsonify({'success': False, 'message': 'Pedido no encontrado'}), 404
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
 

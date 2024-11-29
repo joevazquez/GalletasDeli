@@ -12,6 +12,7 @@
         <div class="nav-links">
             <a href="{{ url_for('catalogo_productos_ventas') }}" class="active">Ordenar</a>
             <a href="{{ url_for('dashboard_ventas') }}">Dashboard Ventas</a>
+            <a href="{{ url_for('ventas_inventario') }}">Inventario ventas</a>
             
         </div>
         <div class="logo">
@@ -31,15 +32,15 @@
                 <p>Nuez</p>
                 <div class="counter">
                     <p>Medio kilo</p>
-                    <button class="decrement" onclick="updateCounter('surtidas', 'half-kilo', -1)">−</button>
-                    <span id="surtidas-half-kilo-counter">0</span>
-                    <button class="increment" onclick="updateCounter('surtidas', 'half-kilo', 1)">+</button>
+                    <button class="decrement" onclick="updateCounter('nuez', 'half-kilo', -1)">−</button>
+                    <span id="nuez-half-kilo-counter">0</span>
+                    <button class="increment" onclick="updateCounter('nuez', 'half-kilo', 1)">+</button>
                 </div>
                 <div class="counter">
                     <p>6 piezas</p>
-                    <button class="decrement" onclick="updateCounter('surtidas', 'six-pieces', -1)">−</button>
-                    <span id="surtidas-six-pieces-counter">0</span>
-                    <button class="increment" onclick="updateCounter('surtidas', 'six-pieces', 1)">+</button>
+                    <button class="decrement" onclick="updateCounter('nuez', 'six-pieces', -1)">−</button>
+                    <span id="nuez-six-pieces-counter">0</span>
+                    <button class="increment" onclick="updateCounter('nuez', 'six-pieces', 1)">+</button>
                 </div>
             </div>
 
@@ -49,15 +50,15 @@
                 <p>Naranja</p>
                 <div class="counter">
                     <p>Medio kilo</p>
-                    <button class="decrement" onclick="updateCounter('surtidas', 'half-kilo', -1)">−</button>
-                    <span id="surtidas-half-kilo-counter">0</span>
-                    <button class="increment" onclick="updateCounter('surtidas', 'half-kilo', 1)">+</button>
+                    <button class="decrement" onclick="updateCounter('naranja', 'half-kilo', -1)">−</button>
+                    <span id="naranja-half-kilo-counter">0</span>
+                    <button class="increment" onclick="updateCounter('naranja', 'half-kilo', 1)">+</button>
                 </div>
                 <div class="counter">
                     <p>6 piezas</p>
-                    <button class="decrement" onclick="updateCounter('surtidas', 'six-pieces', -1)">−</button>
-                    <span id="surtidas-six-pieces-counter">0</span>
-                    <button class="increment" onclick="updateCounter('surtidas', 'six-pieces', 1)">+</button>
+                    <button class="decrement" onclick="updateCounter('naranja', 'six-pieces', -1)">−</button>
+                    <span id="naranja-six-pieces-counter">0</span>
+                    <button class="increment" onclick="updateCounter('naranja', 'six-pieces', 1)">+</button>
                 </div>
             </div>
 
@@ -67,15 +68,15 @@
                 <p>Coco</p>
                 <div class="counter">
                     <p>Medio kilo</p>
-                    <button class="decrement" onclick="updateCounter('surtidas', 'half-kilo', -1)">−</button>
-                    <span id="surtidas-half-kilo-counter">0</span>
-                    <button class="increment" onclick="updateCounter('surtidas', 'half-kilo', 1)">+</button>
+                    <button class="decrement" onclick="updateCounter('coco', 'half-kilo', -1)">−</button>
+                    <span id="coco-half-kilo-counter">0</span>
+                    <button class="increment" onclick="updateCounter('coco', 'half-kilo', 1)">+</button>
                 </div>
                 <div class="counter">
                     <p>6 piezas</p>
-                    <button class="decrement" onclick="updateCounter('surtidas', 'six-pieces', -1)">−</button>
-                    <span id="surtidas-six-pieces-counter">0</span>
-                    <button class="increment" onclick="updateCounter('surtidas', 'six-pieces', 1)">+</button>
+                    <button class="decrement" onclick="updateCounter('coco', 'six-pieces', -1)">−</button>
+                    <span id="coco-six-pieces-counter">0</span>
+                    <button class="increment" onclick="updateCounter('coco', 'six-pieces', 1)">+</button>
                 </div>
             </div>
 
@@ -84,15 +85,15 @@
                 <p>Chocolate</p>
                 <div class="counter">
                     <p>Medio kilo</p>
-                    <button class="decrement" onclick="updateCounter('surtidas', 'half-kilo', -1)">−</button>
-                    <span id="surtidas-half-kilo-counter">0</span>
-                    <button class="increment" onclick="updateCounter('surtidas', 'half-kilo', 1)">+</button>
+                    <button class="decrement" onclick="updateCounter('chocolate', 'half-kilo', -1)">−</button>
+                    <span id="chocolate-half-kilo-counter">0</span>
+                    <button class="increment" onclick="updateCounter('chocolate', 'half-kilo', 1)">+</button>
                 </div>
                 <div class="counter">
                     <p>6 piezas</p>
-                    <button class="decrement" onclick="updateCounter('surtidas', 'six-pieces', -1)">−</button>
-                    <span id="surtidas-six-pieces-counter">0</span>
-                    <button class="increment" onclick="updateCounter('surtidas', 'six-pieces', 1)">+</button>
+                    <button class="decrement" onclick="updateCounter('chocolate', 'six-pieces', -1)">−</button>
+                    <span id="chocolate-six-pieces-counter">0</span>
+                    <button class="increment" onclick="updateCounter('chocolate', 'six-pieces', 1)">+</button>
                 </div>
             </div>
 
@@ -101,15 +102,15 @@
                 <p>Avena</p>
                 <div class="counter">
                     <p>Medio kilo</p>
-                    <button class="decrement" onclick="updateCounter('surtidas', 'half-kilo', -1)">−</button>
-                    <span id="surtidas-half-kilo-counter">0</span>
-                    <button class="increment" onclick="updateCounter('surtidas', 'half-kilo', 1)">+</button>
+                    <button class="decrement" onclick="updateCounter('avena', 'half-kilo', -1)">−</button>
+                    <span id="avena-half-kilo-counter">0</span>
+                    <button class="increment" onclick="updateCounter('avena', 'half-kilo', 1)">+</button>
                 </div>
                 <div class="counter">
                     <p>6 piezas</p>
-                    <button class="decrement" onclick="updateCounter('surtidas', 'six-pieces', -1)">−</button>
-                    <span id="surtidas-six-pieces-counter">0</span>
-                    <button class="increment" onclick="updateCounter('surtidas', 'six-pieces', 1)">+</button>
+                    <button class="decrement" onclick="updateCounter('avena', 'six-pieces', -1)">−</button>
+                    <span id="avena-six-pieces-counter">0</span>
+                    <button class="increment" onclick="updateCounter('avena', 'six-pieces', 1)">+</button>
                 </div>
             </div>
 
@@ -131,91 +132,97 @@
             </div>
         </div>
 
-        <!-- Resumen del pedido -->
-        <div class="order-summary">
-            <!-- Catálogo de clientes grandes -->
-        <div class="client-selector">
-            <h2>Seleccionar Cliente Grande</h2>
-            <select id="rol" name="rol" required>
-                <option value="" disabled selected>Selecciona un cliente</option>
-                <option value="7-Eleven">7-Eleven</option>
-                <option value="Chedrahui">Chedrahui</option>
-                <option value="La Comer">La Comer</option>
-                <option value="Oxxo">Oxxo</option>
-                <option value="Sam">Sam's Club</option>
-                <option value="Soriana">Soriana</option>
-                <option value="Wallmart">Wallmart Express</option>
-            </select>
-        </div>
-            <h2>Resumen del Pedido</h2>
-            <div class="prices">
-                <p><strong>Precios:</strong></p>
-                <p>Caja de medio kilo: $100</p>
-                <p>Caja de 6 piezas: $50</p>
+                <!-- Resumen del pedido -->
+                <div class="order-summary">
+                    <div class="client-selector">
+                        <h2>Seleccionar Cliente Grande</h2>
+                        <form id="pedidoForm" action="{{ url_for('guardar_pedido_ventas') }}" method="POST">
+                            <input type="hidden" name="resumenPedido" id="resumenPedido">
+                            <input type="hidden" name="totalPedido" id="totalPedido">
+                            <form id="pedidoForm" action="{{ url_for('guardar_pedido_ventas') }}" method="POST">
+                                <select id="cliente" name="cliente" required>
+                                    <option value="" disabled selected>Selecciona un cliente</option>
+                                    <option value="7-Eleven">7-Eleven</option>
+                                    <option value="Chedrahui">Chedrahui</option>
+                                    <option value="La Comer">La Comer</option>
+                                    <option value="Oxxo">Oxxo</option>
+                                    <option value="Sam's Club">Sam's Club</option>
+                                    <option value="Soriana">Soriana</option>
+                                    <option value="Wallmart">Wallmart Express</option>
+                                </select>
+                                <input type="hidden" name="resumenPedido" id="resumenPedido">
+                                <input type="hidden" name="totalPedido" id="totalPedido">
+                                <button type="submit" class="btn-order">Ordenar</button>
+                            </form>                            
+                    </div>
+                    <h2>Resumen del Pedido</h2>
+                    <div class="prices">
+                        <p><strong>Precios:</strong></p>
+                        <p>Caja de medio kilo: $100</p>
+                        <p>Caja de 6 piezas: $50</p>
+                    </div>
+                    <div class="order-details" id="order-details">
+                        <!-- Actualización dinámica del pedido -->
+                    </div>
+                    <p class="total" id="order-total">Total: $0.00</p>
+        
+                    <!-- Formulario para enviar el pedido -->
+                    <form id="pedidoForm" action="{{ url_for('guardar_pedido_ventas') }}" method="POST">
+                        <input type="hidden" name="resumenPedido" id="resumenPedido">
+                        <input type="hidden" name="totalPedido" id="totalPedido">
+                    </form>                    
+                </div>
             </div>
-            <div class="order-details" id="order-details">
-                <!-- Actualización dinámica del pedido -->
-            </div>
-            <p class="total" id="order-total">Total: $0.00</p>
-
-            <!-- Formulario para enviar el pedido -->
-            <form action="{{ url_for('catalogo_productos_ventas') }}" method="POST">
-                <input type="hidden" name="resumenPedido" id="resumenPedido">
-                <input type="hidden" name="totalPedido" id="totalPedido">
-                <button type="submit" class="btn-order">Ordenar</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Scripts -->
-    <script>
-        const prices = { "half-kilo": 100, "six-pieces": 50 };
-        const orderSummary = {};
-
-        function updateCounter(product, type, change) {
-            const counterId = `${product}-${type}-counter`;
-            const counterElement = document.getElementById(counterId);
-            let count = parseInt(counterElement.textContent, 10);
-
-            count = Math.max(0, count + change);
-            counterElement.textContent = count;
-
-            if (!orderSummary[product]) {
-                orderSummary[product] = { "half-kilo": 0, "six-pieces": 0 };
-            }
-            orderSummary[product][type] = count;
-
-            updateOrderSummary();
-        }
-
-        function updateOrderSummary() {
-            const orderDetails = document.getElementById("order-details");
-            const orderTotal = document.getElementById("order-total");
-            let total = 0;
-
-            orderDetails.innerHTML = "";
-
-            for (const [product, quantities] of Object.entries(orderSummary)) {
-                const { "half-kilo": halfKilo, "six-pieces": sixPieces } = quantities;
-
-                if (halfKilo > 0 || sixPieces > 0) {
-                    orderDetails.innerHTML += `
-                        <p><strong>${capitalize(product)}:</strong></p>
-                        ${halfKilo > 0 ? `<p>Cajas de medio kilo: ${halfKilo}</p>` : ""}
-                        ${sixPieces > 0 ? `<p>Cajas de 6 piezas: ${sixPieces}</p>` : ""}
-                    `;
-                    total += halfKilo * prices["half-kilo"] + sixPieces * prices["six-pieces"];
+        
+            <!-- Scripts -->
+            <script>
+                const prices = { "half-kilo": 100, "six-pieces": 50 };
+                const orderSummary = {};
+        
+                function updateCounter(product, type, change) {
+                    const counterId = `${product}-${type}-counter`;
+                    const counterElement = document.getElementById(counterId);
+                    let count = parseInt(counterElement.textContent, 10);
+        
+                    count = Math.max(0, count + change);
+                    counterElement.textContent = count;
+        
+                    if (!orderSummary[product]) {
+                        orderSummary[product] = { "half-kilo": 0, "six-pieces": 0 };
+                    }
+                    orderSummary[product][type] = count;
+        
+                    updateOrderSummary();
                 }
-            }
-
-            orderTotal.textContent = `Total: $${total.toFixed(2)}`;
-            document.getElementById("resumenPedido").value = JSON.stringify(orderSummary);
-            document.getElementById("totalPedido").value = total.toFixed(2);
-        }
-
-        function capitalize(str) {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        }
-    </script>
+        
+                function updateOrderSummary() {
+                    const orderDetails = document.getElementById("order-details");
+                    const orderTotal = document.getElementById("order-total");
+                    let total = 0;
+        
+                    orderDetails.innerHTML = "";
+        
+                    for (const [product, quantities] of Object.entries(orderSummary)) {
+                        const { "half-kilo": halfKilo, "six-pieces": sixPieces } = quantities;
+        
+                        if (halfKilo > 0 || sixPieces > 0) {
+                            orderDetails.innerHTML += `
+                                <p><strong>${capitalize(product)}:</strong></p>
+                                ${halfKilo > 0 ? `<p>Cajas de medio kilo: ${halfKilo}</p>` : ""}
+                                ${sixPieces > 0 ? `<p>Cajas de 6 piezas: ${sixPieces}</p>` : ""}
+                            `;
+                            total += halfKilo * prices["half-kilo"] + sixPieces * prices["six-pieces"];
+                        }
+                    }
+        
+                    orderTotal.textContent = `Total: $${total.toFixed(2)}`;
+                    document.getElementById("resumenPedido").value = JSON.stringify(orderSummary);
+                    document.getElementById("totalPedido").value = total.toFixed(2);
+                }
+        
+                function capitalize(str) {
+                    return str.charAt(0).toUpperCase() + str.slice(1);
+                }
+            </script>
 </body>
 </html>

@@ -1,0 +1,150 @@
+/* General body settings */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #a5d8ff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    margin-right: 20px;
+    font-size: 18px;
+}
+
+.nav-links a:hover {
+    text-decoration: underline;
+}
+
+.logo img {
+    width: 50px;
+}
+
+.user-greeting {
+    font-size: 16px;
+    color: #333;
+}
+
+/* Contenedor principal */
+.main-container {
+    max-width: 1100px;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Título principal */
+.main-container h1 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #4c2b19;
+    text-align: center;
+}
+
+/* Botón genérico */
+.btn {
+    background-color: #4c2b19;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+    max-width: 200px;
+    margin-top: 10px;
+}
+
+.btn:hover {
+    background-color: #3a2214;
+}
+
+/* Botones específicos */
+.btn-save {
+    align-self: center;
+}
+
+.btn-order {
+    align-self: center;
+}
+
+/* Formulario de dirección */
+.address-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.address-form .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.address-form .form-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #4c2b19;
+}
+
+.address-form .form-group input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #a5d8ff;
+    border-radius: 5px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+/* Resumen del Pedido */
+.order-summary {
+    background-color: #f4d9a8;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.order-summary h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #4c2b19;
+    margin-bottom: 15px;
+}
+
+.order-summary p {
+    font-size: 16px;
+    margin: 10px 0;
+}
+
+.order-summary #order-details {
+    margin-bottom: 15px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .main-container {
+        padding: 15px;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}

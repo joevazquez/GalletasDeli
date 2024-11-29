@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rastreo de Órdenes - Ventas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/rastreo-ordenes-ventas.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Sahitya:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Barra de Navegación -->
+    <nav>
+        <div>
+            <a href="{{ url_for('catalogo_productos_ventas') }}">Ordenar</a>
+            <a href="{{ url_for('rastreo_ordenes_ventas') }}"><u>Rastrear</u></a>
+            <a href="{{ url_for('dashboard_ventas') }}">Dashboard</a>
+        </div>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/logo_ventas.png') }}" alt="Galletas Deli">
+        </div>
+        <div class="user-greeting">
+            Hola, {{ user_name }}
+        </div>
+    </nav>
+
+    <!-- Contenedor Principal -->
+    <div class="main-container">
+        <h1>Rastreo de Órdenes - Ventas</h1>
+
+        <!-- Encabezado de la Lista de Órdenes -->
+        <div class="order-list-header">
+            <p>Orden</p>
+            <p>Fecha de creación</p>
+            <p>Fecha de entrega</p>
+            <p>Estado</p>
+            <p>Cliente</p>
+            <p></p>
+        </div>
+
+        <!-- Iterar sobre los pedidos -->
+        {% if historial_pedidos_ventas %}
+            {% for order in historial_pedidos_ventas %}
+                <div class="order-item">
+                    <p>#{{ order['id'] }}</p>
+                    <p>{{ order['creation_date'] }}</p>
+                    <p>{{ order['delivery_date'] }}</p>
+                    <p>{{ order['status'] }}</p>
+                    <p>{{ order['cliente'] }}</p>
+                    <a href="#" class="details-btn" data-order-id="{{ order['id'] }}">Detalles</a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No hay órdenes registradas.</p>
+        {% endif %}
+    </div>
+
+    <!-- Modal para Mostrar Detalles del Pedido -->
+    <div id="order-details" class="details-container" style="display: none;">
+        <h2>Detalles del Pedido</h2>
+        <p id="order-id"></p>
+        <ul id="order-products">
+            <!-- Productos del pedido se cargarán dinámicamente aquí -->
+        </ul>
+        <p id="order-total"><strong>Total:</strong> $0</p>
+        <button onclick="closeDetails()">Cerrar</button>
+    </div>
+</body>
+
+<script>
+    // Agregar eventos a los botones de detalles
+    document.querySelectorAll('.details-btn').forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            const orderId = this.dataset.orderId;
+
+            fetch(`/get-order-details-ventas/${orderId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Error ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(details => {
+                    if (details.success) {
+                        const orderIdElement = document.getElementById('order-id');
+                        const productsList = document.getElementById('order-products');
+                        const orderTotalElement = document.getElementById('order-total');
+
+                        orderIdElement.textContent = `Orden ID: #${details.details.id}`;
+                        productsList.innerHTML = '';
+
+                        details.details.products.forEach(product => {
+                            const li = document.createElement('li');
+                            li.textContent = `${product.quantity}x ${product.name} - $${product.price}`;
+                            productsList.appendChild(li);
+                        });
+
+                        orderTotalElement.innerHTML = `<strong>Total:</strong> $${details.details.total}`;
+                        document.getElementById('order-details').style.display = 'block';
+                    } else {
+                        alert(details.message || 'Error al recuperar los detalles del pedido.');
+                    }
+                })
+                .catch(error => {
+                    alert(`Error al cargar los detalles del pedido: ${error.message}`);
+                    console.error(error);
+                });
+        });
+    });
+
+    // Cerrar el modal de detalles
+    function closeDetails() {
+        document.getElementById('order-details').style.display = 'none';
+    }
+</script>
+</html>
