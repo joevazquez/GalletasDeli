@@ -186,33 +186,54 @@
 </html>
 
 <script>
-  document.getElementById('form-actualizar-direccion').addEventListener('submit', function (e) {
-    e.preventDefault();
+    document.getElementById('form-actualizar-direccion').addEventListener('submit', function (e) {
+        e.preventDefault();
     
-    const data = {
-        estado: document.getElementById('estado').value,
-        ciudad: document.getElementById('ciudad').value,
-        delegacion: document.getElementById('delegacion').value,
-        colonia: document.getElementById('colonia').value,
-        calle_numero: document.getElementById('calle_numero').value,
-    };
-
-    fetch('/actualizar_direccion', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Dirección actualizada exitosamente');
-        } else {
-            alert('Error al actualizar la dirección');
-        }
-    })
-    .catch(err => console.error('Error:', err));
+        // Recopilar los datos del formulario
+        const data = {
+            estado: document.getElementById('estado').value,
+            ciudad: document.getElementById('ciudad').value,
+            delegacion: document.getElementById('delegacion').value,
+            colonia: document.getElementById('colonia').value,
+            calle_numero: document.getElementById('calle_numero').value,
+        };
+    
+        // Realizar la solicitud para actualizar la dirección
+        fetch('/actualizar_direccion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Mostrar mensaje de éxito
+                alert(data.message || 'Dirección actualizada exitosamente');
+                
+                // Actualizar dinámicamente la dirección actual en la página
+                const direccionActualElement = document.querySelector('.direccion-actual');
+                if (direccionActualElement) {
+                    direccionActualElement.textContent = `Dirección actual: ${data.updated_direccion}`;
+                }
+    
+                // Limpiar los campos del formulario
+                document.getElementById('estado').value = '';
+                document.getElementById('ciudad').value = '';
+                document.getElementById('delegacion').value = '';
+                document.getElementById('colonia').value = '';
+                document.getElementById('calle_numero').value = '';
+            } else {
+                // Manejar errores específicos
+                alert(data.message || 'Error al actualizar la dirección');
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            alert('Hubo un error al procesar la solicitud. Inténtalo nuevamente.');
+        });
+    });
 
     // Validación en tiempo real para el campo de fecha de expiración
     document.getElementById('fecha_expiracion').addEventListener('input', function (e) {
@@ -228,5 +249,4 @@
             input.setCustomValidity("");
         }
     });
-});
 </script>

@@ -265,17 +265,27 @@ def actualizar_direccion():
     data = request.get_json()
     user_id = session.get('user_id')
     
+    if not user_id:
+        return jsonify({'success': False, 'message': 'Usuario no identificado'}), 400
+
     nueva_direccion = f"{data['estado']}, {data['ciudad']}, {data['delegacion']}, {data['colonia']}, {data['calle_numero']}"
-    
+
     conn = get_db_connection()
-    conn.execute(
-        "UPDATE Clientes SET Direccion = ? WHERE ID_cliente = ?",
-        (nueva_direccion, user_id)
-    )
-    conn.commit()
-    conn.close()
-    
-    return jsonify({'success': True})
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE Clientes SET Direccion = ? WHERE ID_cliente = ?",
+            (nueva_direccion, user_id)
+        )
+        conn.commit()
+        if cursor.rowcount == 0:
+            return jsonify({'success': False, 'message': 'No se encontró el usuario en la base de datos'}), 404
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error en la base de datos: {str(e)}'}), 500
+    finally:
+        conn.close()
+
+    return jsonify({'success': True, 'updated_direccion': nueva_direccion, 'message': 'Dirección actualizada exitosamente'})
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -1024,7 +1034,6 @@ def rastreo_ordenes_ventas():
         historial_pedidos_ventas=historial_pedidos_ventas,
         user_name=session.get('user_name', 'Usuario')
     )
-
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
