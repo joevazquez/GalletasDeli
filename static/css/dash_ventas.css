@@ -1,0 +1,108 @@
+/* General settings */
+html {
+  font-family: "Montserrat";
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #f5f7fa; /* Light gray background */
+  margin: 0;
+  padding: 0;
+}
+
+/* Sidebar styling */
+.sidebar {
+  background-color: #f8f9fc; /* White background */
+  border-right: 1px solid #dee2e6;
+  height: 100vh;
+  padding: 20px;
+}
+
+.sidebar img {
+  border-radius: 50%;
+  width: 80px;
+}
+
+.sidebar p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #495057;
+}
+
+.sidebar p.text-muted {
+  color: #868e96;
+  font-size: 12px;
+}
+
+.sidebar .nav {
+  padding-top: 20px;
+}
+
+.sidebar .nav .nav-item .nav-link {
+  color: #495057;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  text-decoration: none;
+  border-radius: 6px;
+}
+
+.sidebar .nav .nav-item .nav-link:hover,
+.sidebar .nav .nav-item .nav-link.active {
+  background-color: #dbe5ff;
+  color: #094779;
+}
+
+/* Main content styling */
+.container-fluid {
+  padding: 30px;
+}
+
+.container-fluid .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.container-fluid .header img {
+  height: 40px;
+  width: auto;
+}
+
+.container-fluid .form-container {
+  background-color: #ffffff; /* White background */
+  padding: 20px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.container-fluid .form-container h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #495057;
+}
+
+.container-fluid .form-container p {
+  font-size: 14px;
+  color: #6c757d;
+}
+
+/* Button Styling */
+.container-fluid .btn {
+  background-color: #1d72b8;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.container-fluid .btn:hover {
+  background-color: #155a8a;
+}

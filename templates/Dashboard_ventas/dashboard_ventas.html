@@ -8,49 +8,65 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dash_ventas.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Dashboard - Ventas</title>
-    <style>
-        html {
-            font-family: "Montserrat";
-        }
-
-        body {
-            margin: 0;
-            overflow-x: hidden;
-        }
-
-        h1 {
-            color: #094779;
-            background-color: #EEEEEE;
-        }
-    </style>
 </head>
 
 <body>
-    <h1 style="width: 100%; margin: 0; height: 70px; padding-left: 20px;align-content: center;">Reporte de Ventas</h1>
-    <div style="margin: 10px;">
-        <div style="display: flex;">
-            <canvas id="ventas_mes" style="max-width:25%; max-height: 300px"></canvas>
-            <canvas id="presentacion" style="max-width:25%; max-height: 300px"></canvas>
-            <canvas id="galletas" style="max-width:25%; max-height: 300px"></canvas>
-            <div id="top_clientes"
-                style="max-width:25%; max-height: 300px; font-size: 12px;overflow-y: auto;overflow-x: hidden;"></div>
-        </div>
-        <div style="display: flex;">
-            <canvas id="ventas_ano" style="max-width:60%; max-height: 300px"></canvas>
-            <div id="top_estados"
-                style="max-width:40%; max-height: 300px; font-size: 12px;overflow-y: auto;overflow-x: hidden;"></div>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-2 sidebar bg-light p-3 vh-100">
+                <div class="text-center mb-4">
+                    <p class="user-role fw-bold">{{ session.get('user_name', 'Usuario') }}</p>
+                    <p class="user-organization text-muted">{{ session.get('user_role', 'Rol no definido') }}</p>
+                </div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('catalogo_productos_ventas') }}">Catalogo de Productos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('ventas_inventario') }}">Inventario</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('dashboard_ventas') }}">Dashboard Ventas</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-10 px-5 py-4">
+                <h1 class="mb-4">Reporte de Ventas</h1>
+                <div class="mb-4">
+                    <div class="row">
+                        <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
+                            <canvas id="ventas_mes" class="w-80, h-50"></canvas>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
+                            <canvas id="presentacion" class="w-60"></canvas>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
+                            <canvas id="galletas" class="w-80, h-50"></canvas>
+                        </div>
+                        <div class="col-md-3" id="top_clientes" style="font-size: 12px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <canvas id="ventas_ano" class="w-100"></canvas>
+                    </div>
+                    <div class="col-md-4" id="top_estados" style="font-size: 12px; overflow-y: auto;"></div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        Chart.defaults.backgroundColor = '#094779'
-        const ventas_mes = document.getElementById("ventas_mes")
-        const presentacion = document.getElementById("presentacion")
-        const galletas = document.getElementById("galletas")
+        Chart.defaults.backgroundColor = '#094779';
 
-        const ventas_ano = document.getElementById("ventas_ano")
-
+        // Chart - Ventas Mes
+        const ventas_mes = document.getElementById("ventas_mes");
         new Chart(ventas_mes, {
             type: 'bar',
             data: {
@@ -64,13 +80,13 @@
             },
             options: {
                 scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+                    y: { beginAtZero: true }
                 }
             }
         });
 
+        // Chart - Presentación
+        const presentacion = document.getElementById("presentacion");
         new Chart(presentacion, {
             type: 'doughnut',
             data: {
@@ -84,6 +100,8 @@
             }
         });
 
+        // Chart - Galletas
+        const galletas = document.getElementById("galletas");
         new Chart(galletas, {
             type: 'bar',
             data: {
@@ -97,21 +115,14 @@
             },
             options: {
                 scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+                    y: { beginAtZero: true }
                 }
             }
         });
 
+        // GridJS - Top Clientes
         new gridjs.Grid({
-            columns: [
-                {
-                    name: 'Nombre',
-                    sort: false
-                },
-                'Ticket Promedio'
-            ],
+            columns: [{ name: 'Nombre', sort: false }, 'Ticket Promedio'],
             data: [
                 ['John Doe', '$5,201'],
                 ['Marck Zill', '$5,156'],
@@ -125,13 +136,11 @@
                 ['Mary Smith', '$1,598'],
             ],
             sort: true,
-            style: {
-                th: {
-                    color: '#094779'
-                }
-            }
+            style: { th: { color: '#094779' } }
         }).render(document.getElementById('top_clientes'));
 
+        // Chart - Ventas Año
+        const ventas_ano = document.getElementById("ventas_ano");
         new Chart(ventas_ano, {
             type: 'scatter',
             data: {
@@ -149,21 +158,17 @@
             },
             options: {
                 scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+                    y: { beginAtZero: true }
                 }
             }
         });
 
+        // GridJS - Top Estados
         new gridjs.Grid({
             columns: [
-                {
-                    name: 'Estado',
-                    sort: false
-                },
+                { name: 'Estado', sort: false },
                 'Venta',
-                "Cantidad"
+                'Cantidad'
             ],
             data: [
                 ['Ciudad de México', '$50,201', 10000],
@@ -178,15 +183,9 @@
                 ['Colima', '$10,598', 500],
             ],
             sort: true,
-            style: {
-                th: {
-                    color: '#094779'
-                }
-            }
+            style: { th: { color: '#094779' } }
         }).render(document.getElementById('top_estados'));
-
     </script>
-
 </body>
 
 </html>

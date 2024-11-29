@@ -1,8 +1,11 @@
 import sqlite3
 import jsonify
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_file
 import json
 from datetime import datetime, timedelta
+import pandas as pd
+import io
+import xlsxwriter
 
 app = Flask(__name__)
 app.secret_key = "GalletasDeliAdmin1234#$%"
@@ -160,7 +163,7 @@ def authenticate():
             elif user["role"].lower() == "qa":
                 return redirect(url_for("qa_dashboard"))
             elif user["role"].lower() == "ventas":
-                return redirect(url_for("dashboard_ventas"))
+                return redirect(url_for("ventas_inventario"))
             else:
                 flash("Rol no reconocido.", "warning")
                 return redirect(url_for("login"))
@@ -745,32 +748,115 @@ def inventario():
 
 @app.route("/dashboard-ventas")
 def dashboard_ventas():
-    # Verifica que el usuario esté autenticado como empleado y que sea almacenista
-    if "user_id" not in session or session.get("user_role") != "Ventas":
-        flash("Acceso no autorizado. Por favor, inicie sesión como almacenista.", "danger")
-        return redirect(url_for("login"))
-
-    # Aquí puedes incluir lógica adicional para cargar datos como proveedores, etc.
-    conn = get_db_connection()
-    proveedores = conn.execute("SELECT ID, Nombre FROM Proveedores").fetchall()
-    conn.close()
-    return render_template("/Dashboard_ventas/dashboard_ventas.html")
+    return render_template("Dashboard_ventas/dashboard_ventas.html")
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
-"""
+
 @app.route("/ventas_inventario")
-def dashboard_ventas():
-    # Verifica que el usuario esté autenticado como empleado y que sea almacenista
+def ventas_inventario():
+    # Asegúrate de que el usuario tenga el rol adecuado
     if "user_id" not in session or session.get("user_role") != "Ventas":
-        flash("Acceso no autorizado. Por favor, inicie sesión como almacenista.", "danger")
+        flash("Acceso no autorizado. Por favor, inicie sesión.", "danger")
         return redirect(url_for("login"))
 
-    # Aquí puedes incluir lógica adicional para cargar datos como proveedores, etc.
     conn = get_db_connection()
-    proveedores = conn.execute("SELECT ID, Nombre FROM Proveedores").fetchall()
+    ingredientes = conn.execute(
+        """
+        SELECT ID, Fecha_ingreso, Nombre, Numero_lote, Cantidad, Unidad
+        FROM Lotes
+        """
+    ).fetchall()
     conn.close()
-    return render_template("/inventario/inventario_ventas.html")
-"""
+
+    return render_template("inventario/inventario_ventas.html", ingredientes=ingredientes)
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@app.route("/generar_reporte_inventario", methods=["GET"])
+def generar_reporte_inventario():
+    # Conecta a la base de datos y recupera los datos del inventario
+    conn = get_db_connection()
+    inventario = conn.execute(
+        """
+        SELECT Nombre, Numero_lote, Proveedor, Cantidad, Unidad
+        FROM Lotes
+        """
+    ).fetchall()
+    conn.close()
+
+    # Crea un archivo Excel en memoria
+    output = io.BytesIO()
+    workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+    worksheet = workbook.add_worksheet("Inventario Lotes")
+
+    # Agrega encabezados a la hoja de cálculo
+    headers = ["Nombre", "Número de Lote", "Proveedor", "Cantidad", "Unidad"]
+    for col_num, header in enumerate(headers):
+        worksheet.write(0, col_num, header)
+
+    # Agrega los datos del inventario
+    for row_num, row in enumerate(inventario, start=1):
+        worksheet.write(row_num, 0, row["Nombre"])
+        worksheet.write(row_num, 1, row["Numero_lote"])
+        worksheet.write(row_num, 2, row["Proveedor"])
+        worksheet.write(row_num, 3, row["Cantidad"])
+        worksheet.write(row_num, 4, row["Unidad"])
+
+    # Cierra el archivo Excel
+    workbook.close()
+    output.seek(0)
+
+    # Obtén la fecha actual para el nombre del archivo
+    from datetime import datetime
+    fecha_actual = datetime.now().strftime("%Y-%m-%d")
+    nombre_archivo = f"Inventario_Lotes_Terminados_{fecha_actual}.xlsx"
+
+    # Devuelve el archivo como una descarga
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name=nombre_archivo,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@app.route('/catalogo_productos_ventas', methods=['GET', 'POST'])
+def catalogo_productos_ventas():
+    if request.method == 'POST':
+        # Recibe los datos del formulario
+        resumen_pedido = request.form.get('resumenPedido', 'Sin resumen disponible')
+        total_pedido = request.form.get('totalPedido', 0)
+        
+        # Guarda los datos en la sesión
+        session['resumen_pedido_ventas'] = resumen_pedido
+        session['total_pedido_ventas'] = total_pedido
+        
+        # Redirige a una página específica para ventas (por ejemplo, generación de reportes)
+        return redirect(url_for('dashboard_ventas'))
+    
+    # Carga el catálogo de productos para ventas
+    return render_template(
+        'Catalogo/catalogo-productos-ventas.html',
+        user_pedido=session.get('resumen_pedido_ventas', 'Sin resumen disponible'),
+        total_pedido=session.get('total_pedido_ventas', 0),
+        user_name=session.get('user_name', 'Usuario')
+    )
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@app.route('/catalogo_clientes_grandes', methods=['GET'])
+def catalogo_clientes_grandes():
+    # Simulación de datos de clientes grandes
+    clientes_grandes = [
+        {"nombre": "Distribuidora ABC", "contacto": "Carlos López", "telefono": "555-1234", "email": "contacto@abc.com"},
+        {"nombre": "Mayorista XYZ", "contacto": "Ana Pérez", "telefono": "555-5678", "email": "ventas@xyz.com"},
+        {"nombre": "Tiendas Elite", "contacto": "Juan García", "telefono": "555-9876", "email": "elite@tiendas.com"},
+    ]
+    
+    # Renderiza el HTML de clientes grandes
+    return render_template('Catalogo/catalogo_clientes_grandes.html', clientes_grandes=clientes_grandes)
+
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 @app.route("/logout")

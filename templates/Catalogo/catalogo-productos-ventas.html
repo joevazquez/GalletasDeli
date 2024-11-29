@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galletas Deli - Ordenar</title>
+    <title>Galletas Deli - Catálogo Ventas</title>
     <link rel="stylesheet" href="/static/css/catalogo-productos.css">
 </head>
 <body>
     <!-- Barra de navegación -->
     <nav class="navbar">
         <div class="nav-links">
-            <a href="{{ url_for('catalogo_productos') }}" class="active">Ordenar</a>
-            <a href="{{ url_for('rastreo_pedidos') }}">Rastrear</a>
+            <a href="{{ url_for('catalogo_productos_ventas') }}" class="active">Ordenar</a>
+            <a href="{{ url_for('dashboard_ventas') }}">Dashboard Ventas</a>
+            
         </div>
         <div class="logo">
             <img src="/static/images/logo_ventas.png" alt="Galletas Deli">
@@ -19,7 +20,6 @@
         <div class="user-greeting">
             Hola, {{ user_name }}
         </div>
-        
     </nav>
 
     <!-- Contenedor principal -->
@@ -133,6 +133,20 @@
 
         <!-- Resumen del pedido -->
         <div class="order-summary">
+            <!-- Catálogo de clientes grandes -->
+        <div class="client-selector">
+            <h2>Seleccionar Cliente Grande</h2>
+            <select id="rol" name="rol" required>
+                <option value="" disabled selected>Selecciona un cliente</option>
+                <option value="7-Eleven">7-Eleven</option>
+                <option value="Chedrahui">Chedrahui</option>
+                <option value="La Comer">La Comer</option>
+                <option value="Oxxo">Oxxo</option>
+                <option value="Sam">Sam's Club</option>
+                <option value="Soriana">Soriana</option>
+                <option value="Wallmart">Wallmart Express</option>
+            </select>
+        </div>
             <h2>Resumen del Pedido</h2>
             <div class="prices">
                 <p><strong>Precios:</strong></p>
@@ -145,7 +159,7 @@
             <p class="total" id="order-total">Total: $0.00</p>
 
             <!-- Formulario para enviar el pedido -->
-            <form action="{{ url_for('catalogo_productos') }}" method="POST">
+            <form action="{{ url_for('catalogo_productos_ventas') }}" method="POST">
                 <input type="hidden" name="resumenPedido" id="resumenPedido">
                 <input type="hidden" name="totalPedido" id="totalPedido">
                 <button type="submit" class="btn-order">Ordenar</button>
@@ -155,20 +169,17 @@
 
     <!-- Scripts -->
     <script>
-        const prices = { "half-kilo": 100, "six-pieces": 50 }; // Precios por tipo de producto
-        const orderSummary = {}; // Resumen del pedido
+        const prices = { "half-kilo": 100, "six-pieces": 50 };
+        const orderSummary = {};
 
-        // Actualiza los contadores y el resumen del pedido
         function updateCounter(product, type, change) {
             const counterId = `${product}-${type}-counter`;
             const counterElement = document.getElementById(counterId);
             let count = parseInt(counterElement.textContent, 10);
 
-            // Asegúrate de que el contador nunca sea negativo
             count = Math.max(0, count + change);
             counterElement.textContent = count;
 
-            // Actualiza el resumen del pedido
             if (!orderSummary[product]) {
                 orderSummary[product] = { "half-kilo": 0, "six-pieces": 0 };
             }
@@ -182,7 +193,7 @@
             const orderTotal = document.getElementById("order-total");
             let total = 0;
 
-            orderDetails.innerHTML = ""; // Limpia el contenido anterior
+            orderDetails.innerHTML = "";
 
             for (const [product, quantities] of Object.entries(orderSummary)) {
                 const { "half-kilo": halfKilo, "six-pieces": sixPieces } = quantities;
@@ -198,7 +209,7 @@
             }
 
             orderTotal.textContent = `Total: $${total.toFixed(2)}`;
-            document.getElementById("resumenPedido").value = JSON.stringify(orderSummary); // Guardar como JSON
+            document.getElementById("resumenPedido").value = JSON.stringify(orderSummary);
             document.getElementById("totalPedido").value = total.toFixed(2);
         }
 

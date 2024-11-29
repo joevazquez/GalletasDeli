@@ -47,13 +47,6 @@ def consultar_usuarios_y_empleados():
         else:
             print("No hay empleados registrados en la base de datos.")
 
-            # Consulta para obtener todos los empleados con sus roles
-        query_empleados_todos = '''
-            SELECT *
-            FROM Empleado
-        '''
-        print(query_empleados_todos)
-
     except sqlite3.Error as e:
         print(f"Error al consultar la base de datos: {e}")
     finally:

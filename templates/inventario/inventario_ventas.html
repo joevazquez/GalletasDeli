@@ -18,10 +18,13 @@
                 </div>
                 <ul class="nav flex-column pt-4">
                     <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('catalogo_productos_ventas') }}">Catalogo de Productos</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link active" href="{{ url_for('ventas_inventario') }}">Inventario</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('dashboard-ventas') }}">Dashboard Ventas</a>
+                        <a class="nav-link" href="{{ url_for('dashboard_ventas') }}">Dashboard Ventas</a>
                     </li>
                 </ul>
             </div>
@@ -29,7 +32,7 @@
             <!-- Main Content -->
             <div class="col-10 px-5 py-3">
                 <div class="header mb-4">
-                    <h1 class="title">Inventario</h1>
+                    <h1 class="title">Inventario de Lotes</h1>
                 </div>
 
                 <!-- Tabla de inventario -->
@@ -38,10 +41,8 @@
                         <thead class="table-light">
                             <tr>
                                 <th>ID</th>
-                                <th>Llegada</th>
-                                <th>Estado</th>
+                                <th>Fecha de Ingreso</th>
                                 <th>Nombre</th>
-                                <th>Proveedor</th>
                                 <th>No. de Lote</th>
                                 <th>Cantidad</th>
                                 <th>Unidad</th>
@@ -53,17 +54,7 @@
                                 <tr>
                                     <td>{{ ingrediente.ID }}</td>
                                     <td>{{ ingrediente.Fecha_ingreso }}</td>
-                                    <td>
-                                        {% if ingrediente.Cantidad < 100 %}
-                                        <span class="badge bg-danger">POCO</span>
-                                        {% elif ingrediente.Cantidad <= 300 %}
-                                        <span class="badge bg-warning">MEDIO</span>
-                                        {% else %}
-                                        <span class="badge bg-success">MUCHO</span>
-                                        {% endif %}
-                                    </td>
                                     <td>{{ ingrediente.Nombre }}</td>
-                                    <td>{{ ingrediente.Proveedor }}</td>
                                     <td>{{ ingrediente.Numero_lote }}</td>
                                     <td>{{ ingrediente.Cantidad }}</td>
                                     <td>{{ ingrediente.Unidad }}</td>
@@ -71,7 +62,7 @@
                                 {% endfor %}
                             {% else %}
                                 <tr>
-                                    <td colspan="8" class="text-center">No hay datos en el inventario.</td>
+                                    <td colspan="6" class="text-center">No hay datos en el inventario.</td>
                                 </tr>
                             {% endif %}
                         </tbody>
@@ -80,8 +71,8 @@
 
                 <!-- Botón para generar reporte -->
                 <div class="text-end mt-4">
-                    <button class="btn btn-primary">Generar reporte</button>
-                </div>
+                    <a href="{{ url_for('generar_reporte_inventario') }}" class="btn btn-primary">Generar reporte</a>
+                </div>                
             </div>
         </div>
     </div>
