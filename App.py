@@ -1,5 +1,4 @@
 import sqlite3
-import jsonify
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_file
 import json
 from datetime import datetime, timedelta
@@ -562,19 +561,48 @@ def salida_ingredientes():
 @app.route("/registrar_salida/<int:lote_id>", methods=["POST"])
 def registrar_salida(lote_id):
     try:
+        # Obtener la cantidad del json de la petición
+        data = request.get_json()
+        cantidad_retirar = data.get("cantidad")
+
+        # Verificar que la cantidad sea válida
+        if cantidad_retirar is None or cantidad_retirar <= 0:
+            return jsonify({"success": False, "error": "Cantidad no válida"}), 400
+
         # Conectar a la base de datos
         conn = get_db_connection()
+        cursor = conn.cursor()
 
-        # Eliminar el lote correspondiente
-        conn.execute("DELETE FROM Lotes WHERE ID = ?", (lote_id,))
+        # Obtener la cantidad actual del lote
+        cursor.execute("SELECT Cantidad FROM Lotes WHERE ID = ?", (lote_id,))
+        lote = cursor.fetchone()
+
+        if not lote:
+            return jsonify({"success": False, "error": "Lote no encontrado"}), 404
+
+        cantidad_actual = lote["Cantidad"]
+
+        # Verificar que haya suficiente cantidad en el lote
+        if cantidad_retirar > cantidad_actual:
+            return jsonify({"success": False, "error": "Cantidad insuficiente en el lote"}), 400
+
+        # Calcular la cantidad restante
+        cantidad_restante = cantidad_actual - cantidad_retirar
+
+        if cantidad_restante == 0:
+            # Eliminar el lote si no queda cantidad
+            cursor.execute("DELETE FROM Lotes WHERE ID = ?", (lote_id,))
+        else:
+            # Actualizar el lote con la cantidad restante
+            cursor.execute("UPDATE Lotes SET Cantidad = ? WHERE ID = ?", (cantidad_restante, lote_id))
+
         conn.commit()
         conn.close()
 
-        # Devolver una respuesta JSON de éxito
         return jsonify({"success": True}), 200
     except Exception as e:
-        # En caso de error, devolver un mensaje JSON de error
         return jsonify({"success": False, "error": str(e)}), 500
+
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
 

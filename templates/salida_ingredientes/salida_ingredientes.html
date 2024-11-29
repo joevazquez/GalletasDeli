@@ -54,14 +54,17 @@
                                 <th>Nombre</th>
                                 <th>Proveedor</th>
                                 <th>No. de Lote</th>
-                                <th>Cantidad</th>
                                 <th>Unidad</th>
+                                <th>Cantidad Disponible</th>
+                                <th>Cantidad a Retirar</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for ingrediente in ingredientes %}
                             <tr data-id="{{ ingrediente.ID }}">
-                                <td><input type="radio" name="seleccionIngrediente" value="{{ ingrediente.ID }}"></td>
+                                <td>
+                                    <input type="radio" name="seleccionIngrediente" value="{{ ingrediente.ID }}">
+                                </td>
                                 <td>{{ ingrediente.ID }}</td>
                                 <td>{{ ingrediente.Fecha_ingreso }}</td>
                                 <td>
@@ -76,11 +79,16 @@
                                 <td>{{ ingrediente.Nombre }}</td>
                                 <td>{{ ingrediente.Proveedor }}</td>
                                 <td>{{ ingrediente.Numero_lote }}</td>
-                                <td>{{ ingrediente.Cantidad }}</td>
                                 <td>{{ ingrediente.Unidad }}</td>
+                                <td>{{ ingrediente.Cantidad }}</td>
+                                <td>
+                                    <input type="number" class="form-control" min="1" max="{{ ingrediente.Cantidad }}" 
+                                           placeholder="Cantidad a retirar" id="cantidad-{{ ingrediente.ID }}" disabled>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
+                        
                     </table>
                 </div>
 
@@ -113,17 +121,30 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById('tablaIngredientes').addEventListener('change', function () {
+        document.getElementById('tablaIngredientes').addEventListener('change', function (e) {
+            // Al principio los campos de cantidad están deshabilitados
+            document.querySelectorAll('input[type="number"]').forEach(input => {
+                input.disabled = true;                
+            });
+
+            // Se habilita el campo de cantidad para el lote seleccionado
+            const selectedRow = document.querySelector('input[name="seleccionIngrediente"]:checked');
+            if (selectedRow) {
+                const cantidadInput = document.getElementById(`cantidad-${selectedRow.value}`);
+                cantidadInput.disabled = false;
+            }
+
+            // Habilitar el botón "Siguiente"
             document.getElementById('btnSiguiente').disabled = false;
         });
 
+        // Mostrar el modal de confirmación cuando se presiona el botón de "Siguiente"
         document.getElementById('btnSiguiente').addEventListener('click', function () {
             const modal = new bootstrap.Modal(document.getElementById('modalConfirmacion'));
             modal.show();
         });
 
         document.getElementById('btnRegistrar').addEventListener('click', function () {
-            // Obtener el ID del lote seleccionado
             const selectedRow = document.querySelector('input[name="seleccionIngrediente"]:checked');
             if (!selectedRow) {
                 alert("Por favor, seleccione un ingrediente para registrar la salida.");
@@ -131,26 +152,24 @@
             }
 
             const loteID = selectedRow.value;
+            const cantidad = document.getElementById(`cantidad-${loteID}`).value;
+
+            if (!cantidad || cantidad <= 0) {
+                alert("Por favor, ingrese una cantidad válida.");
+                return;
+            }
 
             // Enviar la solicitud al servidor para registrar la salida
-            fetch(`/registrar_salida/${loteID}`, { method: "POST" })
+            fetch(`/registrar_salida/${loteID}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ cantidad: parseInt(cantidad, 10) })
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Eliminar la fila seleccionada de la tabla
-                        const rowToRemove = document.querySelector(`tr[data-id="${loteID}"]`);
-                        if (rowToRemove) {
-                            rowToRemove.remove();
-                        }
-
-                        // Limpiar selección y deshabilitar botón siguiente
-                        document.querySelectorAll('input[name="seleccionIngrediente"]').forEach(input => input.checked = false);
-                        document.getElementById('btnSiguiente').disabled = true;
-
-                        // Ocultar modal y mostrar mensaje de éxito
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalConfirmacion'));
-                        modal.hide();
                         alert("¡Se registró con éxito la salida de ingredientes!");
+                        location.reload(); // Recargar la página para actualizar la tabla
                     } else {
                         alert("Hubo un error al registrar la salida. Intente nuevamente.");
                     }
@@ -159,6 +178,7 @@
                     alert("Hubo un problema con la solicitud. Intente nuevamente.");
                 });
         });
+
     </script>
 </body>
 </html>
